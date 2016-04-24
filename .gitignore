@@ -1,5 +1,4 @@
 twitter4j.properties
-resources/tweet_storage/*
 
 *.class
 

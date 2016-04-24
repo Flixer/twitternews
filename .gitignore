@@ -1,3 +1,6 @@
+twitter4j.properties
+resources/tweet_storage/*
+
 *.class
 
 # Mobile Tools for Java (J2ME)

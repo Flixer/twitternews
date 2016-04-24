@@ -6,6 +6,7 @@ import org.apache.flink.api.java.operators.FlatMapOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 
 import de.bigdatapraktikum.twitternews.processing.IdfValueCalculator;
+import de.bigdatapraktikum.twitternews.utils.AppConfig;
 import twitter4j.Status;
 
 public class TwitterNewsTopicAnalysis {
@@ -14,7 +15,7 @@ public class TwitterNewsTopicAnalysis {
 		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
 		// get input data from previously stored twitter data
-		DataSource<String> tweets = env.readTextFile("resources/tweet_storage/");
+		DataSource<String> tweets = env.readTextFile(AppConfig.TWEET_STORAGE_PATH);
 
 		// calculate idf values
 		FlatMapOperator<String, Tuple2<Status, Double>> idfValues = tweets.flatMap(new IdfValueCalculator());

@@ -13,7 +13,7 @@ Themenanalyse von Nachrichtendiensten mittels Twitter.
 - Zu crawlende Twitter-Accounts kannst du in *de.bigdatapraktikum.twitternews.utils.__AppConfig.java__* anpassen
 - Zum starten des Crawlens, führe *de.bigdatapraktikum.twitternews.__TwitterNewsCollector.java__* aus
 
-## Wie lasse ich meine importierten Tweets analysieren?
+## Wie lasse ich meine importierten Tweets analysieren??
 - Zum starten der Analyse, führe *de.bigdatapraktikum.twitternews.__TwitterNewsTopicAnalysis.java__* aus
 
 

@@ -1,19 +1,29 @@
 package de.bigdatapraktikum.twitternews.processing;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
+
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
 
-import twitter4j.Status;
 
-public class IdfValueCalculator implements FlatMapFunction<String, Tuple2<Status, Double>> {
+
+public class IdfValueCalculator implements MapFunction<Tuple2<String, Integer>, Tuple2<String, Double>> {
 	private static final long serialVersionUID = 1L;
-
+	
+	// The amount of documents is need to calculate the IDF-Value
+	double amountOfDocuments;
+	
+	protected IdfValueCalculator() {
+		// TODO Auto-generated constructor stub
+	}
+	// The constructor sets the amount of documents
+	public IdfValueCalculator(double amountOfDocuments) {
+		this.amountOfDocuments = amountOfDocuments;
+	}
+	
 	@Override
-	public void flatMap(String tweetString, Collector<Tuple2<Status, Double>> collector) throws Exception {
-		// TODO Implement IDF algorithm
-		System.out.println("--> " + tweetString + " <--");
-//		collector.collect(new Tuple2<Status, Double>(tweet, 12.34));
+	public Tuple2<String, Double> map(Tuple2<String, Integer> input) throws Exception {
+		// Calculates the IDF-Value
+		return new Tuple2<>(input.f0, Math.log10(amountOfDocuments / input.f1));
 	}
 
 }

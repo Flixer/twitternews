@@ -22,7 +22,8 @@ public class StatusToTweetMapper implements MapFunction<Status, Tweet> {
 	 */
 	@Override
 	public Tweet map(Status status) throws Exception {
-		// replace semicolon and new lines from content and source in order to save it later properly
+		// replace semicolon and new lines from content and source in order to
+		// save it later properly
 		String content = status.getText();
 		content = content.replaceAll("[;\r\n]", "");
 		String source = status.getUser().getName();

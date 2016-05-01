@@ -29,7 +29,7 @@ public class StatusToTweetMapper implements MapFunction<Status, Tweet> {
 		String source = status.getUser().getName();
 		source = source.replaceAll("[;\r\n]", "");
 		// fill Tweet object with content from the twitter4j.Status Object
-		Tweet t = new Tweet(LocalDateTime.ofInstant(status.getCreatedAt().toInstant(), ZoneId.systemDefault()), source,
+		Tweet t = new Tweet(status.getId(), LocalDateTime.ofInstant(status.getCreatedAt().toInstant(), ZoneId.systemDefault()), source,
 				content, status.getRetweetCount());
 		return t;
 	}

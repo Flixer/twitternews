@@ -35,6 +35,7 @@ public class GraphCreator {
 		
 		edgeList.add(d);
 		edgeList.add(e);
+		DataSource<String> filterdWordsinTweets = env.readTextFile(AppConfig.FILTERED_STORAGE_PATH);
 		
 		DataSet<Vertex<Long, String>> vertices = (DataSet<Vertex<Long, String>>) vertextList.iterator();
 		DataSet<Edge<Long, Double>> edges = (DataSet<Edge<Long, Double>>) edgeList.iterator();

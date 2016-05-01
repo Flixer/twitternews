@@ -7,6 +7,7 @@ import java.util.StringTokenizer;
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 
@@ -14,7 +15,7 @@ import org.apache.flink.util.Collector;
  * This class extracts all unique words for each tweet. A list of irrelevant
  * words can be used to exclude these words from the result set.
  */
-public class UniqueWordMapper extends RichFlatMapFunction<String, Tuple2<String, Integer>> {
+public class UniqueWordMapper extends RichFlatMapFunction<Tuple2<Long, String>, Tuple3<Long, String, Integer>> {
 	private static final long serialVersionUID = 1L;
 
 	// set of irrelevant words
@@ -40,7 +41,7 @@ public class UniqueWordMapper extends RichFlatMapFunction<String, Tuple2<String,
 	}
 
 	@Override
-	public void flatMap(String tweet, Collector<Tuple2<String, Integer>> output) throws Exception {
+	public void flatMap(Tuple2<Long, String> tweet, Collector<Tuple3<Long, String, Integer>> output) throws Exception {
 		// TODO filter words even more:
 		// 1. add words to AppConfig.IRRELEVANT_WORDS
 		// 2. prevent dates, numbers and maybe urls from being collected
@@ -48,13 +49,13 @@ public class UniqueWordMapper extends RichFlatMapFunction<String, Tuple2<String,
 		// is a non word character (care since .replaceAll("\W", "") will also
 		// remove הצü)
 		this.emittedWords.clear();
-		StringTokenizer st = new StringTokenizer(tweet);
+		StringTokenizer st = new StringTokenizer(tweet.f1);
 
 		while (st.hasMoreTokens()) {
 			String word = st.nextToken().toLowerCase();
 
 			if (!this.irrelevantWords.contains(word) && !this.emittedWords.contains(word)) {
-				output.collect(new Tuple2<>(word, 1));
+				output.collect(new Tuple3<>(tweet.f0, word, 1));
 				this.emittedWords.add(word);
 			}
 		}

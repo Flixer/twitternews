@@ -51,4 +51,7 @@ local.properties
 # STS (Spring Tool Suite)
 .springBeans
 # Code Recommenders
-.recommenders/
+.recommenders/resources/filtered_tweets/1
+resources/filtered_tweets/2
+resources/filtered_tweets/3
+resources/filtered_tweets/4

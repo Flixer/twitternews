@@ -26,7 +26,8 @@ import de.bigdatapraktikum.twitternews.processing.UniqueWordsIdfJoin;
 import de.bigdatapraktikum.twitternews.utils.AppConfig;
 
 public class TwitterNewsTopicAnalysis {
-	public static void main(String[] args) throws Exception {
+	public DataSet<Tuple2<Long, String>> getFilteredWordsInTweets() throws Exception{
+	//public static void main(String[] args) throws Exception {
 		// set up the execution environment
 		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
@@ -38,8 +39,6 @@ public class TwitterNewsTopicAnalysis {
 
 		// TODO Tweets are currently strings (semicolon seperated values) and
 		// need to be converted to Tweet objects first
-		
-		//TODO Seperate IDF Calculation and Graph Creation
 		
 		// Calculates occurance for all the unique words. Excludes the
 		// irrelevant words that are defined in the AppConfig.java
@@ -93,23 +92,13 @@ public class TwitterNewsTopicAnalysis {
 				return word.f1 < 3;
 			}
 		})).where(1).equalTo(0).with(new UniqueWordsIdfJoin()).sortPartition(0, Order.ASCENDING);
-		
-		DataSet<Tuple2<Long,String>> aggregatedWordsinTweets = filterdWordsinTweets.groupBy(0).reduce(new ReduceFunction<Tuple2<Long,String>>() {
-			
-			@Override
-			public Tuple2<Long, String> reduce(Tuple2<Long, String> in1, Tuple2<Long, String> in2) throws Exception {
-				
-				return new Tuple2<>(in1.f0, in1.f1 +";" + in2.f1);
-			}
-		});
-		DataSet<Tuple3<String, String, Integer>> edges = aggregatedWordsinTweets.flatMap(new EdgeMapper()).groupBy(0,1).sum(2);
-		Graph<String, NullValue, Integer> graph = Graph.fromTupleDataSet(edges, env);
-		System.out.println();
-		
+
+		return filterdWordsinTweets;
+	}
 		
 		// TODO either save data in sink or process it further within this class
 
 		// run application
-		env.execute();
-	}
+		//env.execute();
 }
+

@@ -1,7 +1,7 @@
 package de.bigdatapraktikum.twitternews.utils;
 
 public class AppConfig {
-	public static final int MAX_IDF_VALUE = 3;
+	public static final double MAX_IDF_VALUE = 2.5;
 
 	public static final String RESOURCES_TWEETS_TXT = "resources/tweets.txt";
 	public static final String FILTERED_STORAGE_PATH = "resources/filtered_tweets";
@@ -9,7 +9,6 @@ public class AppConfig {
 	public static final String[] TWITTER_ACCOUNTS_TO_CRAWL = new String[] { "faznet", "SPIEGELONLINE", "SZ",
 			"jungewelt" };
 
-	// TODO think about externalize it in a text file or database
 	public static final String[] IRRELEVANT_WORDS = new String[] { "aber", "abermals", "abgerufen", "abgerufene",
 			"abgerufener", "abgerufenes", "ähnlich", "alle", "allein", "allem", "allemal", "allen", "allenfalls",
 			"allenthalben", "aller", "allerdings", "allerlei", "alles", "allesamt", "allgemein", "allmählich", "allzu",
@@ -99,5 +98,6 @@ public class AppConfig {
 			"wolltest", "wolltet", "womit", "womöglich", "woraufhin", "woraus", "worin", "wurde", "würde", "würden",
 			"z. B.", "zahlreich", "zeitweise", "ziemlich", "zu", "zudem", "zuerst", "zufolge", "zugegeben", "zugleich",
 			"zuletzt", "zum", "zumal", "zumeist", "zur", "zurück", "zusammen", "zusehends", "zuvor", "zuweilen", "zwar",
-			"zweifellos", "zweifelsfrei", "zweifelsohne", "zwischen" };
+			"zweifellos", "zweifelsfrei", "zweifelsohne", "zwischen", "haben", "ab", "via", "geht", "schon", "macht",
+			"fordert", "zwei", "kommt", "machen", "zeigt", "sagen", "worden" };
 };

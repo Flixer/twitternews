@@ -86,6 +86,7 @@ public class TwitterNewsTopicAnalysis {
 						return word.f1 < AppConfig.MAX_IDF_VALUE;
 					}
 				});
+		// filteredIdfValues.print();
 
 		// Join unique words in tweets with filteredIdfValue words, so that the
 		// resulting data is a dataset with tuple2 objects (which contain a
@@ -127,8 +128,7 @@ public class TwitterNewsTopicAnalysis {
 						out.collect(new Tuple2<Tweet, ArrayList<String>>(tweet, wordList));
 					}
 				});
-
-		 wordsPerTweet.print();
+		// wordsPerTweet.print();
 
 		return wordsPerTweet;
 	}

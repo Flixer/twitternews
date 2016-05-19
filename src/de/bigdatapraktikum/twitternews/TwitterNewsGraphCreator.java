@@ -27,7 +27,6 @@ public class TwitterNewsGraphCreator {
 		DataSet<Tuple2<Tweet, ArrayList<String>>> wordsPerTweet = twitterNewsTopicAnalysis.getFilteredWordsInTweets();
 
 		// create the graph
-		// TODO: Write own Grouper, String Order should be indifferent
 		DataSet<Tuple3<String, String, Integer>> edges = wordsPerTweet.flatMap(new EdgeMapper()).groupBy(0, 1).sum(2);
 		Graph<String, NullValue, Integer> graph = Graph.fromTupleDataSet(edges, env);
 		graph.getEdges().print();

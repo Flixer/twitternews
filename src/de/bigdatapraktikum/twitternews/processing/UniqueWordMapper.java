@@ -44,19 +44,20 @@ public class UniqueWordMapper extends RichFlatMapFunction<Tweet, Tuple3<Tweet, S
 	@Override
 	public void flatMap(Tweet tweet, Collector<Tuple3<Tweet, String, Integer>> output) throws Exception {
 		// TODO filter words even more:
-		// 1. add words to AppConfig.IRRELEVANT_WORDS
-		// 2. prevent dates, numbers and maybe urls from being collected
-		// 3. remove punctuation like .,?!;-"'(), maybe delete everythink which
-		// is a non word character (care since .replaceAll("\W", "") will also
-		// remove äöü)
+		// - add words to AppConfig.IRRELEVANT_WORDS
 
 		this.emittedWords.clear();
 		StringTokenizer st = new StringTokenizer(tweet.getContent());
 
 		while (st.hasMoreTokens()) {
-			String word = st.nextToken().toLowerCase();
+			String word = st.nextToken().toLowerCase().trim();
+			word = word.replaceAll("[^a-zA-ZäöüÄÖÜß]", "");
+			boolean isNumber = word.matches("^[0-9]+$");
+			boolean isUrl = word.matches("https?.*");
+			boolean tooShort = word.length() < 2;
 
-			if (!this.irrelevantWords.contains(word) && !this.emittedWords.contains(word)) {
+			if (!isNumber && !isUrl && !tooShort && !this.irrelevantWords.contains(word)
+					&& !this.emittedWords.contains(word)) {
 				output.collect(new Tuple3<>(tweet, word, 1));
 				this.emittedWords.add(word);
 			}

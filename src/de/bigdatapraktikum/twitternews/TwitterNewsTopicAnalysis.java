@@ -39,9 +39,6 @@ public class TwitterNewsTopicAnalysis {
 		// Calculates the number of tweets
 		double amountOfTweets = tweets.count();
 
-		// TODO Tweets are currently strings (semicolon seperated values) and
-		// need to be converted to Tweet objects first
-
 		// Calculates occurrence for all the unique words. Excludes the
 		// irrelevant words that are defined in the AppConfig.java
 		DataSet<Tuple3<Tweet, String, Integer>> uniqueWordsinTweets = tweetsWithID
@@ -131,7 +128,7 @@ public class TwitterNewsTopicAnalysis {
 					}
 				});
 
-		// wordsPerTweet.print();
+		 wordsPerTweet.print();
 
 		return wordsPerTweet;
 	}

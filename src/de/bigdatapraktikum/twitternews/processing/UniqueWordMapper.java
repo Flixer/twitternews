@@ -41,7 +41,6 @@ public class UniqueWordMapper extends RichFlatMapFunction<Tweet, Tuple3<Tweet, S
 		this.emittedWords = new HashSet<>();
 	}
 
-	// TODO: Add Description of Tuples
 	@Override
 	public void flatMap(Tweet tweet, Collector<Tuple3<Tweet, String, Integer>> output) throws Exception {
 		// TODO filter words even more:
@@ -49,7 +48,7 @@ public class UniqueWordMapper extends RichFlatMapFunction<Tweet, Tuple3<Tweet, S
 		// 2. prevent dates, numbers and maybe urls from being collected
 		// 3. remove punctuation like .,?!;-"'(), maybe delete everythink which
 		// is a non word character (care since .replaceAll("\W", "") will also
-		// remove äöü)
+		// remove Ã¤Ã¶Ã¼)
 
 		this.emittedWords.clear();
 		StringTokenizer st = new StringTokenizer(tweet.getContent());

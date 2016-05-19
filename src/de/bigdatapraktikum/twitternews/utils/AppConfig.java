@@ -1,7 +1,7 @@
 package de.bigdatapraktikum.twitternews.utils;
 
 public class AppConfig {
-	public static final double MAX_IDF_VALUE = 2.5;
+	public static final double MAX_IDF_VALUE = 2.2;
 
 	public static final String RESOURCES_TWEETS_TXT = "resources/tweets.txt";
 	public static final String FILTERED_STORAGE_PATH = "resources/filtered_tweets";
@@ -99,5 +99,5 @@ public class AppConfig {
 			"z. B.", "zahlreich", "zeitweise", "ziemlich", "zu", "zudem", "zuerst", "zufolge", "zugegeben", "zugleich",
 			"zuletzt", "zum", "zumal", "zumeist", "zur", "zurück", "zusammen", "zusehends", "zuvor", "zuweilen", "zwar",
 			"zweifellos", "zweifelsfrei", "zweifelsohne", "zwischen", "haben", "ab", "via", "geht", "schon", "macht",
-			"fordert", "zwei", "kommt", "machen", "zeigt", "sagen", "worden" };
+			"fordert", "zwei", "kommt", "machen", "zeigt", "sagen", "worden", "rt"};
 };

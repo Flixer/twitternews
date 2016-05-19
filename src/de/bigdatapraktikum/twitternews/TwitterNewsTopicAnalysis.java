@@ -8,10 +8,12 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.api.java.io.TextOutputFormat.TextFormatter;
 import org.apache.flink.api.java.operators.DataSource;
 import org.apache.flink.api.java.operators.FilterOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.core.fs.FileSystem.WriteMode;
 import org.apache.flink.util.Collector;
 
 import de.bigdatapraktikum.twitternews.processing.IdfValueCalculator;
@@ -21,10 +23,8 @@ import de.bigdatapraktikum.twitternews.source.Tweet;
 import de.bigdatapraktikum.twitternews.utils.AppConfig;
 
 public class TwitterNewsTopicAnalysis {
-	public DataSet<Tuple2<Tweet, ArrayList<String>>> getFilteredWordsInTweets() throws Exception {
-		// public static void main(String[] args) throws Exception {
-		// set up the execution environment
-		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+	public DataSet<Tuple2<Tweet, ArrayList<String>>> getFilteredWordsInTweets(ExecutionEnvironment env)
+			throws Exception {
 
 		// get input data from previously stored twitter data
 		DataSource<String> tweets = env.readTextFile(AppConfig.RESOURCES_TWEETS_TXT, "UTF-8");
@@ -86,7 +86,16 @@ public class TwitterNewsTopicAnalysis {
 						return word.f1 < AppConfig.MAX_IDF_VALUE;
 					}
 				});
-		// filteredIdfValues.print();
+		filteredIdfValues.writeAsFormattedText("resources/nodes.txt", WriteMode.OVERWRITE,
+				new TextFormatter<Tuple2<String, Double>>() {
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public String format(Tuple2<String, Double> value) {
+						return "{\"data\":{\"id\":\"" + value.f0 + "\",\"name\":\"" + value.f0 + "\",\"score\":"
+								+ (1 - value.f1 / AppConfig.MAX_IDF_VALUE) + "},\"group\":\"nodes\"},";
+					}
+				});
 
 		// Join unique words in tweets with filteredIdfValue words, so that the
 		// resulting data is a dataset with tuple2 objects (which contain a

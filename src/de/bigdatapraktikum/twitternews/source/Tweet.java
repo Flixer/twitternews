@@ -49,6 +49,7 @@ public class Tweet {
 	public void setRetweetCount(int retweetCount) {
 		this.retweetCount = retweetCount;
 	}
+
 	public long getId() {
 		return id;
 	}

@@ -8,7 +8,7 @@ public class IdMapper implements MapFunction<String, Tuple2<Long, String>> {
 
 	// The constructor sets the amount of documents
 	public IdMapper() {
-			}
+	}
 
 	@Override
 	public Tuple2<Long, String> map(String input) throws Exception {

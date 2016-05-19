@@ -10,7 +10,6 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
-import org.omg.CORBA.TCKind;
 
 /**
  * This class extracts all unique words for each tweet. A list of irrelevant
@@ -40,6 +39,7 @@ public class UniqueWordMapper extends RichFlatMapFunction<Tuple2<Long, String>, 
 	public void open(Configuration parameters) throws Exception {
 		this.emittedWords = new HashSet<>();
 	}
+
 	// TODO: Add Description of Tuples
 	@Override
 	public void flatMap(Tuple2<Long, String> tweet, Collector<Tuple3<Long, String, Integer>> output) throws Exception {
@@ -49,11 +49,12 @@ public class UniqueWordMapper extends RichFlatMapFunction<Tuple2<Long, String>, 
 		// 3. remove punctuation like .,?!;-"'(), maybe delete everythink which
 		// is a non word character (care since .replaceAll("\W", "") will also
 		// remove הצü)
-		
-		// TODO: Add these declarations for clarity in other parts of the program
+
+		// TODO: Add these declarations for clarity in other parts of the
+		// program
 		Long tweetId = tweet.f0;
 		String tweetContent = tweet.f1;
-		
+
 		this.emittedWords.clear();
 		StringTokenizer st = new StringTokenizer(tweetContent);
 

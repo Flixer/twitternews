@@ -1,6 +1,9 @@
 package de.bigdatapraktikum.twitternews;
 
+import java.util.ArrayList;
+
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
@@ -9,6 +12,7 @@ import org.apache.flink.api.java.operators.DataSource;
 import org.apache.flink.api.java.operators.FilterOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.util.Collector;
 
 import de.bigdatapraktikum.twitternews.processing.IdMapper;
 import de.bigdatapraktikum.twitternews.processing.IdfValueCalculator;
@@ -17,7 +21,7 @@ import de.bigdatapraktikum.twitternews.processing.UniqueWordsIdfJoin;
 import de.bigdatapraktikum.twitternews.utils.AppConfig;
 
 public class TwitterNewsTopicAnalysis {
-	public DataSet<Tuple2<Long, String>> getFilteredWordsInTweets() throws Exception {
+	public DataSet<Tuple2<Long, ArrayList<String>>> getFilteredWordsInTweets() throws Exception {
 		// public static void main(String[] args) throws Exception {
 		// set up the execution environment
 		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -31,68 +35,91 @@ public class TwitterNewsTopicAnalysis {
 		// TODO Tweets are currently strings (semicolon seperated values) and
 		// need to be converted to Tweet objects first
 
-		// Calculates occurance for all the unique words. Excludes the
+		// Calculates occurrence for all the unique words. Excludes the
 		// irrelevant words that are defined in the AppConfig.java
 		DataSet<Tuple3<Long, String, Integer>> uniqueWordsinTweets = tweetsWithID
 				.flatMap(new UniqueWordMapper(AppConfig.IRRELEVANT_WORDS));
 
+		// group all unique words in tweets and get their respective number of
+		// occurences
 		DataSet<Tuple2<String, Integer>> tweetFrequency = uniqueWordsinTweets
 				.map(new MapFunction<Tuple3<Long, String, Integer>, Tuple2<String, Integer>>() {
 					private static final long serialVersionUID = 1L;
 
 					@Override
 					public Tuple2<String, Integer> map(Tuple3<Long, String, Integer> input) throws Exception {
-
-						return new Tuple2<>(input.f1, input.f2);
+						String uniqueWord = input.f1;
+						Integer count = input.f2;
+						return new Tuple2<>(uniqueWord, count);
 					}
-
 				}).groupBy(0).sum(1);
-		// Prints all the Unique words with their occurance in descending order
+
 		// For Testing
-		tweetFrequency.filter(new FilterFunction<Tuple2<String, Integer>>() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public boolean filter(Tuple2<String, Integer> word) throws Exception {
-
-				return word.f1 > 50;
-			}
-		}).sortPartition(1, Order.DESCENDING).print();
+		// Prints all the unique words with their occurrence in descending order
+		// tweetFrequency.filter(new FilterFunction<Tuple2<String, Integer>>() {
+		// private static final long serialVersionUID = 1L;
+		//
+		// @Override
+		// public boolean filter(Tuple2<String, Integer> word) throws Exception
+		// {
+		// return word.f1 > 50;
+		// }
+		// }).sortPartition(1, Order.DESCENDING).print();
 
 		// Calculates the IDF Values for all the words
 		DataSet<Tuple2<String, Double>> idfValues = tweetFrequency.map(new IdfValueCalculator(amountOfTweets));
-		// Testing
-		idfValues.filter(new FilterFunction<Tuple2<String, Double>>() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public boolean filter(Tuple2<String, Double> word) throws Exception {
-
-				return word.f1 < 3;
-			}
-		});
 
 		// Prints all IDF Values
-		idfValues.sortPartition(1, Order.DESCENDING).print();
+		// idfValues.sortPartition(1, Order.DESCENDING).print();
 
+		// consider only words with a maximal idf value
 		FilterOperator<Tuple2<String, Double>> filteredIdfValues = idfValues
 				.filter(new FilterFunction<Tuple2<String, Double>>() {
 					private static final long serialVersionUID = 1L;
 
 					@Override
 					public boolean filter(Tuple2<String, Double> word) throws Exception {
-
-						return word.f1 < 3;
+						return word.f1 < AppConfig.MAX_IDF_VALUE;
 					}
 				});
-		DataSet<Tuple2<Long, String>> filterdWordsinTweets = uniqueWordsinTweets.join(filteredIdfValues).where(1)
-				.equalTo(0).with(new UniqueWordsIdfJoin()).sortPartition(0, Order.ASCENDING);
 
-		return filterdWordsinTweets;
+		// Join unique words in tweets with filteredIdfValue words, so that the
+		// resulting data is a dataset with tuple2 objects (which contain a
+		// tweet and a topic word within that tweet). We group that data by
+		// tweet and aggregate all topic words in an ArrayList. The final result
+		// is a dataset with tweets and a list of all topic words within that
+		// tweet
+		DataSet<Tuple2<Long, ArrayList<String>>> wordsPerTweet = uniqueWordsinTweets.join(filteredIdfValues).where(1)
+				.equalTo(0).with(new UniqueWordsIdfJoin()).groupBy(0)
+				.reduceGroup(new GroupReduceFunction<Tuple2<Long, String>, Tuple2<Long, ArrayList<String>>>() {
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void reduce(Iterable<Tuple2<Long, String>> values,
+							Collector<Tuple2<Long, ArrayList<String>>> out) throws Exception {
+						// reduce data like that:
+						// ------------------------
+						// tweet-1 -> word1
+						// tweet-1 -> word2
+						// tweet-2 -> word1
+						//
+						// to:
+						// ------------------------
+						// tweet-1 -> (word1, word2)
+						// tweet-2 -> (word1)
+
+						Long tweetId = null;
+						ArrayList<String> wordList = new ArrayList<>();
+						for (Tuple2<Long, String> t : values) {
+							tweetId = t.f0;
+							wordList.add(t.f1);
+						}
+						out.collect(new Tuple2<Long, ArrayList<String>>(tweetId, wordList));
+					}
+				});
+
+		//		wordsPerTweet.print();
+
+		return wordsPerTweet;
 	}
-
-	// TODO either save data in sink or process it further within this class
-
-	// run application
-	// env.execute();
 }

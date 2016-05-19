@@ -1,6 +1,8 @@
 package de.bigdatapraktikum.twitternews.utils;
 
 public class AppConfig {
+	public static final int MAX_IDF_VALUE = 3;
+
 	public static final String RESOURCES_TWEETS_TXT = "resources/tweets.txt";
 	public static final String FILTERED_STORAGE_PATH = "resources/filtered_tweets";
 

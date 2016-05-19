@@ -23,7 +23,7 @@ public class TwitterNewsTopicAnalysis {
 		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
 		// get input data from previously stored twitter data
-		DataSource<String> tweets = env.readTextFile(AppConfig.TWEET_STORAGE_PATH);
+		DataSource<String> tweets = env.readTextFile(AppConfig.RESOURCES_TWEETS_TXT);
 		DataSet<Tuple2<Long, String>> tweetsWithID = tweets.map(new IdMapper());
 		// Calculates the number of tweets
 		double amountOfTweets = tweets.count();

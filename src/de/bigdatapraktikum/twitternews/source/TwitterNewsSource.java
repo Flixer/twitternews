@@ -1,5 +1,6 @@
 package de.bigdatapraktikum.twitternews.source;
 
+import java.util.Date;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -17,14 +18,17 @@ public class TwitterNewsSource implements SourceFunction<Status> {
 
 	private boolean isRunning = false;
 	private TreeMap<String, Integer> twitterAccountPagesToCrawl;
+	private Date lastExecutionDate;
 
 	/**
 	 * Initializes the class with an array of twitter accounts which needs to be
 	 * processed
 	 * 
 	 * @param accountArray
+	 * @param lastExecutionDate
 	 */
-	public TwitterNewsSource(String[] accountArray) {
+	public TwitterNewsSource(String[] accountArray, Date lastExecutionDate) {
+		this.lastExecutionDate = lastExecutionDate;
 		twitterAccountPagesToCrawl = new TreeMap<String, Integer>();
 		for (String twitterAccount : accountArray) {
 			// For each twitter account fill TreeMap with account name as key
@@ -68,19 +72,24 @@ public class TwitterNewsSource implements SourceFunction<Status> {
 				}
 			}
 
+			boolean oldTweetDetected = false;
+			for (Status status : statuses) {
+				if (lastExecutionDate != null && status.getCreatedAt().before(lastExecutionDate)) {
+					oldTweetDetected = true;
+					break;
+				}
+				// add status to collector
+				context.collect(status);
+			}
 			// if there are no further tweets, remove the Twitter account name
 			// from the TreeMap
-			if (statuses.size() == 0) {
+			if (statuses.size() == 0 || oldTweetDetected) {
 				twitterAccountPagesToCrawl.remove(accountName);
 				// if there is no further account to crawl, than set isRunning
 				// false
 				if (twitterAccountPagesToCrawl.size() == 0) {
 					isRunning = false;
 				}
-			}
-			for (Status status : statuses) {
-				// add status to collector
-				context.collect(status);
 			}
 		}
 	}

@@ -21,9 +21,11 @@ public class EdgeMapper extends RichFlatMapFunction<Tuple2<Tweet, ArrayList<Stri
 			throws Exception {
 		ArrayList<String> words = input.f1;
 
-		// TODO: Eliminate Wrong Combinations...
 		for (String w1 : words) {
 			for (String w2 : words) {
+				if (w2.equals(w1)) {
+					break;
+				}
 				output.collect(new Tuple3<>(w1, w2, 1));
 			}
 		}

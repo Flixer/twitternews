@@ -6,6 +6,7 @@ import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.operators.DataSource;
+import org.apache.flink.api.java.operators.FilterOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 
@@ -37,10 +38,6 @@ public class TwitterNewsTopicAnalysis {
 
 		DataSet<Tuple2<String, Integer>> tweetFrequency = uniqueWordsinTweets
 				.map(new MapFunction<Tuple3<Long, String, Integer>, Tuple2<String, Integer>>() {
-
-					/**
-					 * 
-					 */
 					private static final long serialVersionUID = 1L;
 
 					@Override
@@ -51,6 +48,7 @@ public class TwitterNewsTopicAnalysis {
 
 				}).groupBy(0).sum(1);
 		// Prints all the Unique words with their occurance in descending order
+		// For Testing
 		tweetFrequency.filter(new FilterFunction<Tuple2<String, Integer>>() {
 			private static final long serialVersionUID = 1L;
 
@@ -63,6 +61,7 @@ public class TwitterNewsTopicAnalysis {
 
 		// Calculates the IDF Values for all the words
 		DataSet<Tuple2<String, Double>> idfValues = tweetFrequency.map(new IdfValueCalculator(amountOfTweets));
+		// Testing
 		idfValues.filter(new FilterFunction<Tuple2<String, Double>>() {
 			private static final long serialVersionUID = 1L;
 
@@ -75,8 +74,9 @@ public class TwitterNewsTopicAnalysis {
 
 		// Prints all IDF Values
 		idfValues.sortPartition(1, Order.DESCENDING).print();
-		DataSet<Tuple2<Long, String>> filterdWordsinTweets = uniqueWordsinTweets
-				.join(idfValues.filter(new FilterFunction<Tuple2<String, Double>>() {
+
+		FilterOperator<Tuple2<String, Double>> filteredIdfValues = idfValues
+				.filter(new FilterFunction<Tuple2<String, Double>>() {
 					private static final long serialVersionUID = 1L;
 
 					@Override
@@ -84,7 +84,9 @@ public class TwitterNewsTopicAnalysis {
 
 						return word.f1 < 3;
 					}
-				})).where(1).equalTo(0).with(new UniqueWordsIdfJoin()).sortPartition(0, Order.ASCENDING);
+				});
+		DataSet<Tuple2<Long, String>> filterdWordsinTweets = uniqueWordsinTweets.join(filteredIdfValues).where(1)
+				.equalTo(0).with(new UniqueWordsIdfJoin()).sortPartition(0, Order.ASCENDING);
 
 		return filterdWordsinTweets;
 	}

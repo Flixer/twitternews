@@ -13,6 +13,9 @@ import twitter4j.Status;
 public class TwitterNewsCollector {
 
 	public static void main(String[] args) throws Exception {
+		
+		// TODO: Implement that Tweets can be collected over a time period
+		
 		// set up the execution environment
 		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 

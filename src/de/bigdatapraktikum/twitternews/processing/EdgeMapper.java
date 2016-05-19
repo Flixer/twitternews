@@ -16,6 +16,8 @@ public class EdgeMapper extends RichFlatMapFunction<Tuple2<Long, String>, Tuple3
 	public void flatMap(Tuple2<Long, String> input, Collector<Tuple3<String, String, Integer>> output)
 			throws Exception {
 		String[] words = input.f1.split(";");
+		
+		// TODO: Eliminate Wrong Combinations...
 		for (String w1 : words) {
 			for (String w2 : words) {
 				output.collect(new Tuple3<>(w1, w2, 1));

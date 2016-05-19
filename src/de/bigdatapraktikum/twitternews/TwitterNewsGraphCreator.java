@@ -22,10 +22,10 @@ public class TwitterNewsGraphCreator {
 
 		// get the filtered tweets
 		TwitterNewsTopicAnalysis twitterNewsTopicAnalysis = new TwitterNewsTopicAnalysis();
-		DataSet<Tuple2<Long, String>> filteredWordsInTweets;
-
-		filteredWordsInTweets = twitterNewsTopicAnalysis.getFilteredWordsInTweets();
-
+		DataSet<Tuple2<Long, String>> filteredWordsInTweets = twitterNewsTopicAnalysis.getFilteredWordsInTweets();
+		
+		//TODO: Rethink the variable naming
+		
 		DataSet<Tuple2<Long, String>> aggregatedWordsinTweets = filteredWordsInTweets.groupBy(0)
 				.reduce(new ReduceFunction<Tuple2<Long, String>>() {
 					private static final long serialVersionUID = 1L;
@@ -38,6 +38,9 @@ public class TwitterNewsGraphCreator {
 					}
 				});
 		// create the graph
+		
+		// TODO: Write own Grouper, String Order should be indiffernt
+		
 		DataSet<Tuple3<String, String, Integer>> edges = aggregatedWordsinTweets.flatMap(new EdgeMapper()).groupBy(0, 1)
 				.sum(2);
 		Graph<String, NullValue, Integer> graph = Graph.fromTupleDataSet(edges, env);

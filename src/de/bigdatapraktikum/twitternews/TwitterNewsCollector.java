@@ -2,7 +2,10 @@ package de.bigdatapraktikum.twitternews;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.Date;
 
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -40,7 +43,9 @@ public class TwitterNewsCollector {
 
 			@Override
 			public void invoke(Tweet tweet) throws Exception {
-				FileWriter fileWritter = new FileWriter(AppConfig.RESOURCES_TWEETS_TXT, true);
+				OutputStreamWriter fileWritter = new OutputStreamWriter(
+						new FileOutputStream(AppConfig.RESOURCES_TWEETS_TXT, true),
+						Charset.forName("UTF-8").newEncoder());
 				BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
 				bufferWritter.write(tweet.toString());
 				bufferWritter.newLine();

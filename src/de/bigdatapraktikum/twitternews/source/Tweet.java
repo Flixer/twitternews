@@ -11,11 +11,11 @@ public class Tweet {
 
 	public Tweet(long id, LocalDateTime publishedAt, String source, String content, int retweetCount) {
 		super();
+		this.id = id;
 		this.publishedAt = publishedAt;
 		this.source = source;
 		this.content = content;
 		this.retweetCount = retweetCount;
-		this.id = id;
 	}
 
 	public LocalDateTime getPublishedAt() {
@@ -61,5 +61,17 @@ public class Tweet {
 	@Override
 	public String toString() {
 		return id + ";" + publishedAt + ";" + source + ";" + content + ";" + retweetCount;
+	}
+
+	public static Tweet fromString(String s) {
+		Tweet tweet = null;
+		try {
+			String[] tweetData = s.split(";");
+			tweet = new Tweet(Long.parseLong(tweetData[0]), LocalDateTime.parse(tweetData[1]), tweetData[2],
+					tweetData[3], Integer.parseInt(tweetData[4]));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return tweet;
 	}
 }

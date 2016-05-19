@@ -10,6 +10,7 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 
 import de.bigdatapraktikum.twitternews.processing.EdgeMapper;
+import de.bigdatapraktikum.twitternews.source.Tweet;
 
 // this class creates a co-occurrence graph
 public class TwitterNewsGraphCreator {
@@ -23,8 +24,9 @@ public class TwitterNewsGraphCreator {
 
 		// get the filtered tweets
 		TwitterNewsTopicAnalysis twitterNewsTopicAnalysis = new TwitterNewsTopicAnalysis();
-		DataSet<Tuple2<Long, ArrayList<String>>> wordsPerTweet = twitterNewsTopicAnalysis.getFilteredWordsInTweets();
-
+		DataSet<Tuple2<Tweet, ArrayList<String>>> wordsPerTweet = twitterNewsTopicAnalysis.getFilteredWordsInTweets();
+		wordsPerTweet.print();
+		
 		// create the graph
 		// TODO: Write own Grouper, String Order should be indifferent
 		DataSet<Tuple3<String, String, Integer>> edges = wordsPerTweet.flatMap(new EdgeMapper()).groupBy(0, 1).sum(2);

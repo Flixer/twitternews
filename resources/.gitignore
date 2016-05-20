@@ -1,3 +1,5 @@
 tweet_storage/
 filtered_tweets/
 tweets.txt
+edges.txt
+nodes.txt

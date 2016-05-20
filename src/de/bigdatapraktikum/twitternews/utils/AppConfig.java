@@ -99,5 +99,6 @@ public class AppConfig {
 			"z. B.", "zahlreich", "zeitweise", "ziemlich", "zu", "zudem", "zuerst", "zufolge", "zugegeben", "zugleich",
 			"zuletzt", "zum", "zumal", "zumeist", "zur", "zurück", "zusammen", "zusehends", "zuvor", "zuweilen", "zwar",
 			"zweifellos", "zweifelsfrei", "zweifelsohne", "zwischen", "haben", "ab", "via", "geht", "schon", "macht",
-			"fordert", "zwei", "kommt", "machen", "zeigt", "sagen", "worden", "rt"};
+			"fordert", "zwei", "kommt", "machen", "zeigt", "sagen", "worden", "rt", "sagt", "eins", "zwei", "drei",
+			"vier", "fünf", "sechs", "sieben", "acht", "neun", "dpa", "faznet" };
 };

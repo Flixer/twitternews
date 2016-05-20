@@ -1,11 +1,11 @@
 package de.bigdatapraktikum.twitternews;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.io.TextOutputFormat.TextFormatter;
-import org.apache.flink.api.java.operators.AggregateOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.core.fs.FileSystem.WriteMode;
@@ -14,12 +14,17 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 
 import de.bigdatapraktikum.twitternews.processing.EdgeMapper;
+import de.bigdatapraktikum.twitternews.processing.TweetFilter;
 import de.bigdatapraktikum.twitternews.source.Tweet;
 import de.bigdatapraktikum.twitternews.utils.AppConfig;
 
 // this class creates a co-occurrence graph
 public class TwitterNewsGraphCreator {
 	public static void main(String[] args) throws Exception {
+		TweetFilter tweetFilter = new TweetFilter();
+//		tweetFilter.setDateFrom(LocalDateTime.now().minusHours(4));
+//		tweetFilter.setDateTo(LocalDateTime.now().minusHours(1));
+
 		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 		env.setParallelism(1);
 
@@ -30,8 +35,8 @@ public class TwitterNewsGraphCreator {
 
 		// get the filtered tweets
 		TwitterNewsTopicAnalysis twitterNewsTopicAnalysis = new TwitterNewsTopicAnalysis();
-		DataSet<Tuple2<Tweet, ArrayList<String>>> wordsPerTweet = twitterNewsTopicAnalysis
-				.getFilteredWordsInTweets(env);
+		DataSet<Tuple2<Tweet, ArrayList<String>>> wordsPerTweet = twitterNewsTopicAnalysis.getFilteredWordsInTweets(env,
+				tweetFilter);
 
 		// create the graph
 		DataSet<Tuple3<String, String, Integer>> edges = wordsPerTweet.flatMap(new EdgeMapper()).groupBy(0, 1).sum(2);

@@ -3,6 +3,7 @@ package de.bigdatapraktikum.twitternews;
 import java.util.ArrayList;
 
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
@@ -17,23 +18,27 @@ import org.apache.flink.core.fs.FileSystem.WriteMode;
 import org.apache.flink.util.Collector;
 
 import de.bigdatapraktikum.twitternews.processing.IdfValueCalculator;
+import de.bigdatapraktikum.twitternews.processing.TweetFilter;
 import de.bigdatapraktikum.twitternews.processing.UniqueWordMapper;
 import de.bigdatapraktikum.twitternews.processing.UniqueWordsIdfJoin;
 import de.bigdatapraktikum.twitternews.source.Tweet;
 import de.bigdatapraktikum.twitternews.utils.AppConfig;
 
 public class TwitterNewsTopicAnalysis {
-	public DataSet<Tuple2<Tweet, ArrayList<String>>> getFilteredWordsInTweets(ExecutionEnvironment env)
-			throws Exception {
+	public DataSet<Tuple2<Tweet, ArrayList<String>>> getFilteredWordsInTweets(ExecutionEnvironment env,
+			TweetFilter filter) throws Exception {
 
 		// get input data from previously stored twitter data
-		DataSource<String> tweets = env.readTextFile(AppConfig.RESOURCES_TWEETS, "UTF-8");
-		DataSet<Tweet> tweetsWithID = tweets.map(new MapFunction<String, Tweet>() {
+		DataSource<String> tweetStrings = env.readTextFile(AppConfig.RESOURCES_TWEETS, "UTF-8");
+		DataSet<Tweet> tweets = tweetStrings.flatMap(new FlatMapFunction<String, Tweet>() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public Tweet map(String value) throws Exception {
-				return Tweet.fromString(value);
+			public void flatMap(String value, Collector<Tweet> out) throws Exception {
+				Tweet tweet = Tweet.fromString(value);
+				if (filter.isValidTweet(tweet)) {
+					out.collect(tweet);
+				}
 			}
 		});
 		// Calculates the number of tweets
@@ -41,7 +46,7 @@ public class TwitterNewsTopicAnalysis {
 
 		// Calculates occurrence for all the unique words. Excludes the
 		// irrelevant words that are defined in the AppConfig.java
-		DataSet<Tuple3<Tweet, String, Integer>> uniqueWordsinTweets = tweetsWithID
+		DataSet<Tuple3<Tweet, String, Integer>> uniqueWordsinTweets = tweets
 				.flatMap(new UniqueWordMapper(AppConfig.IRRELEVANT_WORDS));
 
 		// group all unique words in tweets and get their respective number of

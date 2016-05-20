@@ -1,7 +1,7 @@
 package de.bigdatapraktikum.twitternews.utils;
 
 public class AppConfig {
-	public static final double MAX_IDF_VALUE = 2.3;
+	public static final double MAX_IDF_VALUE = 2.2;
 
 	public static final String RESOURCES_TWEETS = "web/resources/tweets.txt";
 	public static final String RESOURCES_TWEETS_FILTERED = "web/resources/filtered_tweets";
@@ -104,5 +104,6 @@ public class AppConfig {
 			"fordert", "zwei", "kommt", "machen", "zeigt", "sagen", "worden", "rt", "sagt", "eins", "zwei", "drei",
 			"vier", "fünf", "sechs", "sieben", "acht", "neun", "dpa", "faznet", "freuters", "fazsport", "wurden", "gut",
 			"kommen", "findet", "lässt", "kommentiert", "spiegelonline", "trotz", "schreibt", "erste", "erklärt",
-			"bleibt", "afp", "spiegelsport", "sz", "derspiegel" };
+			"bleibt", "afp", "spiegelsport", "sz", "derspiegel", "setzen", "gehen", "berichtet", "fazwoche", "dürfen",
+			"fragen", "bringen" };
 };

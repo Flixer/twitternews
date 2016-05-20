@@ -26,7 +26,12 @@ public class EdgeMapper extends RichFlatMapFunction<Tuple2<Tweet, ArrayList<Stri
 				if (w2.equals(w1)) {
 					break;
 				}
-				output.collect(new Tuple3<>(w1, w2, 1));
+				// always add lexicographically smaller string first
+				if (w1.compareTo(w2) < 0) {
+					output.collect(new Tuple3<>(w1, w2, 1));
+				} else {
+					output.collect(new Tuple3<>(w2, w1, 1));
+				}
 			}
 		}
 

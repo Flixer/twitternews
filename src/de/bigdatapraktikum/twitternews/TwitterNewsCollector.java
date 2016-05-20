@@ -21,7 +21,7 @@ import twitter4j.Status;
 public class TwitterNewsCollector {
 
 	public static void main(String[] args) throws Exception {
-		Date lastExecutionDate = new Date(new File(AppConfig.RESOURCES_TWEETS_TXT).lastModified());
+		Date lastExecutionDate = new Date(new File(AppConfig.RESOURCES_TWEETS).lastModified());
 
 		// set up the execution environment
 		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -43,7 +43,7 @@ public class TwitterNewsCollector {
 			@Override
 			public void invoke(Tweet tweet) throws Exception {
 				OutputStreamWriter fileWritter = new OutputStreamWriter(
-						new FileOutputStream(AppConfig.RESOURCES_TWEETS_TXT, true),
+						new FileOutputStream(AppConfig.RESOURCES_TWEETS, true),
 						Charset.forName("UTF-8").newEncoder());
 				BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
 				bufferWritter.write(tweet.toString());

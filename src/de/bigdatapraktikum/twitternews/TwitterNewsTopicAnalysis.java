@@ -27,7 +27,7 @@ public class TwitterNewsTopicAnalysis {
 			throws Exception {
 
 		// get input data from previously stored twitter data
-		DataSource<String> tweets = env.readTextFile(AppConfig.RESOURCES_TWEETS_TXT, "UTF-8");
+		DataSource<String> tweets = env.readTextFile(AppConfig.RESOURCES_TWEETS, "UTF-8");
 		DataSet<Tweet> tweetsWithID = tweets.map(new MapFunction<String, Tweet>() {
 			private static final long serialVersionUID = 1L;
 
@@ -86,7 +86,7 @@ public class TwitterNewsTopicAnalysis {
 						return word.f1 < AppConfig.MAX_IDF_VALUE;
 					}
 				});
-		filteredIdfValues.writeAsFormattedText("resources/nodes.txt", WriteMode.OVERWRITE,
+		filteredIdfValues.writeAsFormattedText(AppConfig.RESOURCES_GRAPH_NODES, WriteMode.OVERWRITE,
 				new TextFormatter<Tuple2<String, Double>>() {
 					private static final long serialVersionUID = 1L;
 

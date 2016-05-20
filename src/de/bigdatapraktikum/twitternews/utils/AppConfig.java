@@ -1,10 +1,12 @@
 package de.bigdatapraktikum.twitternews.utils;
 
 public class AppConfig {
-	public static final double MAX_IDF_VALUE = 2.2;
+	public static final double MAX_IDF_VALUE = 2.3;
 
-	public static final String RESOURCES_TWEETS_TXT = "resources/tweets.txt";
-	public static final String FILTERED_STORAGE_PATH = "resources/filtered_tweets";
+	public static final String RESOURCES_TWEETS = "web/resources/tweets.txt";
+	public static final String RESOURCES_TWEETS_FILTERED = "web/resources/filtered_tweets";
+	public static final String RESOURCES_GRAPH_NODES = "web/resources/nodes.txt";
+	public static final String RESOURCES_GRAPH_EDGES = "web/resources/edges.txt";
 
 	public static final String[] TWITTER_ACCOUNTS_TO_CRAWL = new String[] { "faznet", "SPIEGELONLINE", "SZ",
 			"jungewelt" };
@@ -100,5 +102,7 @@ public class AppConfig {
 			"zuletzt", "zum", "zumal", "zumeist", "zur", "zurück", "zusammen", "zusehends", "zuvor", "zuweilen", "zwar",
 			"zweifellos", "zweifelsfrei", "zweifelsohne", "zwischen", "haben", "ab", "via", "geht", "schon", "macht",
 			"fordert", "zwei", "kommt", "machen", "zeigt", "sagen", "worden", "rt", "sagt", "eins", "zwei", "drei",
-			"vier", "fünf", "sechs", "sieben", "acht", "neun", "dpa", "faznet" };
+			"vier", "fünf", "sechs", "sieben", "acht", "neun", "dpa", "faznet", "freuters", "fazsport", "wurden", "gut",
+			"kommen", "findet", "lässt", "kommentiert", "spiegelonline", "trotz", "schreibt", "erste", "erklärt",
+			"bleibt", "afp", "spiegelsport", "sz", "derspiegel" };
 };

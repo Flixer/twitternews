@@ -2,16 +2,15 @@ package de.bigdatapraktikum.twitternews;
 
 import java.util.ArrayList;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.io.TextOutputFormat.TextFormatter;
 import org.apache.flink.api.java.operators.DataSource;
-import org.apache.flink.api.java.operators.FilterOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.core.fs.FileSystem.WriteMode;
@@ -37,7 +36,8 @@ public class TwitterNewsTopicAnalysis {
 			public void flatMap(String value, Collector<Tweet> out) throws Exception {
 				Tweet tweet = Tweet.fromString(value);
 				// currently this filter can filter time range
-				// later this filter function could be upgraded with different filter-properties
+				// later this filter function could be upgraded with different
+				// filter-properties
 				if (filter.isValidTweet(tweet)) {
 					out.collect(tweet);
 				}
@@ -80,19 +80,24 @@ public class TwitterNewsTopicAnalysis {
 		// Calculates the IDF Values for all the words
 		DataSet<Tuple2<String, Double>> idfValues = tweetFrequency.map(new IdfValueCalculator(amountOfTweets));
 
-		// Prints all IDF Values
-		// idfValues.sortPartition(1, Order.DESCENDING).print();
+		// DEPRECATED: filter words by MAX_IDF_VALUE -> isn't used any more
+		// because maximum idf value is connected with the total number of
+		// tweets
 
-		// consider only words with a maximal idf value
-		FilterOperator<Tuple2<String, Double>> filteredIdfValues = idfValues
-				.filter(new FilterFunction<Tuple2<String, Double>>() {
-					private static final long serialVersionUID = 1L;
+		// DataSet<Tuple2<String, Double>> filteredIdfValues = idfValues
+		// .filter(new FilterFunction<Tuple2<String, Double>>() {
+		// private static final long serialVersionUID = 1L;
+		//
+		// @Override
+		// public boolean filter(Tuple2<String, Double> word) throws Exception {
+		// return word.f1 < AppConfig.MAX_IDF_VALUE;
+		// }
+		// });
 
-					@Override
-					public boolean filter(Tuple2<String, Double> word) throws Exception {
-						return word.f1 < AppConfig.MAX_IDF_VALUE;
-					}
-				});
+		// get the first n entries with the highest idf value
+		DataSet<Tuple2<String, Double>> filteredIdfValues = idfValues.sortPartition(1, Order.ASCENDING)
+				.first(AppConfig.NUMBER_OF_NODES);
+		double maxIdfValue = filteredIdfValues.max(1).collect().get(0).f1;
 		filteredIdfValues.writeAsFormattedText(AppConfig.RESOURCES_GRAPH_NODES, WriteMode.OVERWRITE,
 				new TextFormatter<Tuple2<String, Double>>() {
 					private static final long serialVersionUID = 1L;
@@ -100,7 +105,7 @@ public class TwitterNewsTopicAnalysis {
 					@Override
 					public String format(Tuple2<String, Double> value) {
 						return "{\"data\":{\"id\":\"" + value.f0 + "\",\"name\":\"" + value.f0 + "\",\"score\":"
-								+ (1 - value.f1 / AppConfig.MAX_IDF_VALUE) + "},\"group\":\"nodes\"},";
+								+ (1 - value.f1 / maxIdfValue) + "},\"group\":\"nodes\"},";
 					}
 				});
 

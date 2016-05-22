@@ -22,8 +22,8 @@ import de.bigdatapraktikum.twitternews.utils.AppConfig;
 public class TwitterNewsGraphCreator {
 	public static void main(String[] args) throws Exception {
 		TweetFilter tweetFilter = new TweetFilter();
-//		tweetFilter.setDateFrom(LocalDateTime.now().minusHours(4));
-//		tweetFilter.setDateTo(LocalDateTime.now().minusHours(1));
+//		 tweetFilter.setDateFrom(LocalDateTime.now().minusDays(1));
+//		 tweetFilter.setDateTo(LocalDateTime.now().minusHours(0));
 
 		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 		env.setParallelism(1);
@@ -43,6 +43,7 @@ public class TwitterNewsGraphCreator {
 		Graph<String, NullValue, Integer> graph = Graph.fromTupleDataSet(edges, env);
 		// graph.getEdges().print();
 
+		// get the strongest connection between two nodes
 		int maxEdgeCount = graph.getEdges().max(2).collect().get(0).f2;
 		graph.getEdges().writeAsFormattedText(AppConfig.RESOURCES_GRAPH_EDGES, WriteMode.OVERWRITE,
 				new TextFormatter<Edge<String, Integer>>() {

@@ -21,6 +21,13 @@ public class EdgeMapper extends RichFlatMapFunction<Tuple2<Tweet, ArrayList<Stri
 			throws Exception {
 		ArrayList<String> words = input.f1;
 
+		// combinatorics without order without putting elements back
+		// insert Matrix (I = Insert, B = break, x = not processed)
+		// B x x x x
+		// I B x x x
+		// I I B x x
+		// I I I B x
+		// I I I I B
 		for (String w1 : words) {
 			for (String w2 : words) {
 				if (w2.equals(w1)) {

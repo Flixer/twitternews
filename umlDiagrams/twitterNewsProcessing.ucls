@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<class-diagram version="1.1.9" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
+  associations="true" dependencies="false" nesting-relationships="true" router="FAN">  
+  <class id="1" language="java" name="de.bigdatapraktikum.twitternews.processing.StatusToTweetMapper" 
+    project="twitter-news" file="/twitter-news/src/de/bigdatapraktikum/twitternews/processing/StatusToTweetMapper.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="117" width="191" x="60" y="249"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="2" language="java" name="de.bigdatapraktikum.twitternews.processing.EdgeMapper" project="twitter-news" 
+    file="/twitter-news/src/de/bigdatapraktikum/twitternews/processing/EdgeMapper.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="117" width="450" x="291" y="249"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="3" language="java" name="de.bigdatapraktikum.twitternews.processing.UniqueWordsIdfJoin" 
+    project="twitter-news" file="/twitter-news/src/de/bigdatapraktikum/twitternews/processing/UniqueWordsIdfJoin.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="117" width="410" x="781" y="249"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="4" language="java" name="de.bigdatapraktikum.twitternews.processing.UniqueWordMapper" 
+    project="twitter-news" file="/twitter-news/src/de/bigdatapraktikum/twitternews/processing/UniqueWordMapper.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="189" width="320" x="1231" y="249"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="5" language="java" name="de.bigdatapraktikum.twitternews.processing.IdfValueCalculator" 
+    project="twitter-news" file="/twitter-news/src/de/bigdatapraktikum/twitternews/processing/IdfValueCalculator.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="135" width="273" x="1591" y="249"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="6" language="java" name="de.bigdatapraktikum.twitternews.processing.TweetFilter" project="twitter-news" 
+    file="/twitter-news/src/de/bigdatapraktikum/twitternews/processing/TweetFilter.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="225" width="191" x="1904" y="249"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    sort-features="false" accessors="true" visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true" static="true"/>    
+    <operations public="true" package="true" protected="true" private="true" static="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>

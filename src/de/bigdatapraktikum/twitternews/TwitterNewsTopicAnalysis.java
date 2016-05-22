@@ -36,6 +36,8 @@ public class TwitterNewsTopicAnalysis {
 			@Override
 			public void flatMap(String value, Collector<Tweet> out) throws Exception {
 				Tweet tweet = Tweet.fromString(value);
+				// currently this filter can filter time range
+				// later this filter function could be upgraded with different filter-properties
 				if (filter.isValidTweet(tweet)) {
 					out.collect(tweet);
 				}

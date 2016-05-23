@@ -12,11 +12,11 @@ Themenanalyse von Nachrichtendiensten mittels Twitter.
 - Tweets werden in __web/resources/tweets.txt__ gespeichert
 - Zu crawlende Twitter-Accounts kannst du in *de.bigdatapraktikum.twitternews.utils.__AppConfig.java__* anpassen
 - Zum starten des Crawlens, führe *de.bigdatapraktikum.twitternews.__TwitterNewsCollector.java__* aus
-- Beim Erneuten Ausführen des Crawlens werden nur neue Tweets der Datei angehangen
+- Beim erneuten Ausführen des Crawlens werden nur neue Tweets der Datei angehangen
 
-## Wie lasse ich meine importierten Tweets analysieren??
+## Wie lasse ich meine importierten Tweets analysieren?
 - Stelle eventuelle Filterrestriktionen am Anfang von *de.bigdatapraktikum.twitternews.__TwitterNewsGraphCreator.java__* ein (aktuell noch manuell programmatisch)
-- Zum starten der Analyse, führe *de.bigdatapraktikum.twitternews.__TwitterNewsGraphCreator.java__* aus
+- Zum Starten der Analyse, führe *de.bigdatapraktikum.twitternews.__TwitterNewsGraphCreator.java__* aus
 - Es werden die Dateien __web/resources/nodes.txt__ und __web/resources/edges.txt__ angelegt, welche Knoten und Kanten des Graphen beinhalten
 - Rufe __web/index.html__ in einem Browser auf, um dir den Graphen anzeigen zu lassen
 

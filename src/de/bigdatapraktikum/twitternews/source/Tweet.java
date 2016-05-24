@@ -74,4 +74,15 @@ public class Tweet {
 		}
 		return tweet;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Tweet) {
+			Tweet tweet = (Tweet) obj;
+			return tweet.getId() == getId() && tweet.getContent().equals(getContent())
+					&& tweet.getPublishedAt().equals(getPublishedAt()) && tweet.getRetweetCount() == getRetweetCount()
+					&& tweet.getSource().equals(getSource());
+		}
+		return false;
+	}
 }

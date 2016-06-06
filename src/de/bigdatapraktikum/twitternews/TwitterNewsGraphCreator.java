@@ -82,10 +82,16 @@ public class TwitterNewsGraphCreator {
 				}, Order.ASCENDING);
 
 		verticleList = graph.getVertices().collect();
-		graph.getVertices().print();
+//		graph.getVertices().print();
 		Graph<String, Integer, Integer> res = graph.runScatterGatherIteration(new VertexGroupUpdater(),
 				new VertexGroupMessenger(), 1);
-		res.getVertices().print();
+		Graph<String, Integer, Integer> res2 = res.runScatterGatherIteration(new VertexGroupUpdater(),
+				new VertexGroupMessenger(), 1);
+		Graph<String, Integer, Integer> res3 = res2.runScatterGatherIteration(new VertexGroupUpdater(),
+				new VertexGroupMessenger(), 1);
+		Graph<String, Integer, Integer> res4 = res3.runScatterGatherIteration(new VertexGroupUpdater(),
+				new VertexGroupMessenger(), 1);
+		res4.getVertices().print();
 
 		env.execute();
 	}
@@ -117,6 +123,7 @@ public class TwitterNewsGraphCreator {
 						break;
 					}
 				}
+				sendMessageTo(edgeTarget, 0);
 			}
 			sendMessageTo(v.getId(), new Integer(maxWeightGroup != null ? maxWeightGroup : v.getValue()));
 		}
@@ -128,8 +135,10 @@ public class TwitterNewsGraphCreator {
 
 		public void updateVertex(Vertex<String, Integer> v, MessageIterator<Integer> m) throws Exception {
 			int groupId = v.getValue();
-			for (int mGroupId : m) {
-				groupId = mGroupId;
+			for (Integer mGroupId : m) {
+				if (mGroupId != 0) {
+					groupId = mGroupId;
+				}
 			}
 			setNewVertexValue(groupId);
 		}

@@ -106,13 +106,7 @@ public class TwitterNewsGraphCreator {
 //		graph.getVertices().print();
 		Graph<String, Integer, Integer> res = graph.runScatterGatherIteration(new VertexGroupUpdater(),
 				new VertexGroupMessenger(), 1);
-		Graph<String, Integer, Integer> res2 = res.runScatterGatherIteration(new VertexGroupUpdater(),
-				new VertexGroupMessenger(), 1);
-		Graph<String, Integer, Integer> res3 = res2.runScatterGatherIteration(new VertexGroupUpdater(),
-				new VertexGroupMessenger(), 1);
-		Graph<String, Integer, Integer> res4 = res3.runScatterGatherIteration(new VertexGroupUpdater(),
-				new VertexGroupMessenger(), 1);
-		res4.getVertices().print();
+		res.getVertices().print();
 
 		env.execute();
 	}

@@ -11,6 +11,7 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.io.TextOutputFormat.TextFormatter;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.utils.DataSetUtils;
 import org.apache.flink.core.fs.FileSystem.WriteMode;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
@@ -31,13 +32,33 @@ public class TwitterNewsGraphCreator {
 	private static List<Vertex<String, Integer>> verticleList;
 
 	public static void main(String[] args) throws Exception {
+			
 		TweetFilter tweetFilter = new TweetFilter();
 		// tweetFilter.setDateFrom(LocalDateTime.now().minusDays(7));
 		// tweetFilter.setDateTo(LocalDateTime.now().minusHours(0));
 
 		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 		env.setParallelism(1);
-
+		
+		
+		//Test
+//		ArrayList<Integer> test1 = new ArrayList<>();
+//		for (int j = 0; j < 200; j++) {
+//			test1.add((int)(Math.random()*100));
+//		}
+//	
+//		
+//		DataSet<Tuple2<Integer, String>> test = env.fromCollection(test1).map(new MapFunction<Integer, Tuple2<Integer, String>>() {
+//
+//			@Override
+//			public Tuple2<Integer, String> map(Integer arg0) throws Exception {
+//				// TODO Auto-generated method stub
+//				return new Tuple2<>(arg0, "Test" + arg0);
+//			}
+//		});
+//		test.sortPartition(0, Order.ASCENDING).print();
+		
+				
 		// returns the co-occurrence graph with the help of the
 		// TwitterNewsTopicAnalysis
 		// public Graph<String, NullValue, Integer> getCoOccurrenceGraph()

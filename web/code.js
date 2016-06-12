@@ -14,6 +14,7 @@ var graphResDataParser = function(data) {
 $.get("resources/edges.txt", graphResDataParser, "text");
 $.get("resources/nodes.txt", graphResDataParser, "text");
 
+
 var initCY = (function() { // on dom ready
 
 	cy = cytoscape({
@@ -173,7 +174,6 @@ var initCY = (function() { // on dom ready
 	} ];
 
 	sliders.forEach(makeSlider);
-
 	buttons.forEach(makeButton);
 
 	function makeLayout(opts) {
@@ -257,31 +257,42 @@ var initCY = (function() { // on dom ready
 
 }); // on dom ready
 
-$('#date').datepicker({ });
+//$('#date').datepicker({ });
 
 $(function() {
 	FastClick.attach(document.body);
 });
 
-/* When the user clicks on the button, 
-toggle between hiding and showing the dropdown content */
-function dropdownVisibility() {
-    document.getElementById("myDropdown").classList.toggle("show");
+$(document).ready(function(){
+	$.getJSON("test.json", success = function(data){
+		var options = "";
+		
+		for(var i = 0; i < data.length; i++)
+			{
+				options += "<option value='" + data[i].name + "'>" + data[i].name + "</option>";
+			}
+
+		$("#twitterAccountList").append(options);
+	});
+});
+
+// the Twitter Account Dropdown is only enabled if the search should be account specific
+function accountSpecific(){
+	var showList = document.getElementById("allAccounts");
+	var show = showList.options[showList.selectedIndex].value;
+	
+	if(show === "0"){
+		//document.getElementById("twitterAccountFilter").classList.toggle("show")
+		document.getElementById("twitterAccountList").disabled=false;
+	} else {
+		document.getElementById("twitterAccountList").disabled=true;
+	}
 }
 
-// Close the dropdown menu if the user clicks outside of it
-window.onclick = function(event) {
-  if (!event.target.matches('.dropbtn')) {
+// gets the chosen Twitter Account from the Account Dropdown
+function filterTwitterAccounts(){
+	var twitterAccountList = document.getElementById("twitterAccountList");
+	var twitterAccount = twitterAccountList.options[twitterAccountList.selectedIndex].text;
+	}
 
-    var dropdowns = document.getElementsByClassName("dropdown-content");
-    var i;
-    for (i = 0; i < dropdowns.length; i++) {
-      var openDropdown = dropdowns[i];
-      if (openDropdown.classList.contains('show')) {
-        openDropdown.classList.remove('show');
-      }
-    }
-  }
-}
 
-$('#date').datepicker({ });

@@ -20,7 +20,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.0/lodash.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script> -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/4.10.3/bootstrap-slider.min.js"></script>
     <script src="http://marvl.infotech.monash.edu/webcola/cola.v3.min.js"></script>
@@ -51,17 +51,26 @@
         </p>
       </div>
       
-      	<div class="dropdown">
-  			<button onclick="dropdownVisibility()" class="dropbtn">Nachrichtendienst wählen:</button>
-  				<div id="myDropdown" class="dropdown-content">
-    				<a>faznet</a>
-			    	<a>SPIEGELONLINE</a>
-			    	<a>SZ</a>
-			    	<a>jungewelt</a>
-	  			</div>
-    	</div>
+      <div class="dropdown">
+      	<form>
+      		Account specific filter:
+      		<select class="dropdown-content" id="allAccounts" onchange="accountSpecific()">
+      			<option value=1>Yes</option>
+      			<option value=0>No</option>
+      		</select>
+      		
+      	</form>      	
+      </div>
+      <div class="AccountDropdown" id="twitterAccountFilter">
+      	<form>
+      		Account:
+      		<select class="AccountDropdown-content" id="twitterAccountList" onchange="filterTwitterAccounts()" disabled></select>
+      	</form>      	
+      </div>
+      
+            
     	<div class="datepicker">
-    		<input id="date" type="text" size="8"/>
+    		<button onclick="openDatepicker()" class="param button"><font color=black>Date:</font></button>
     	</div>
 	</div>
     

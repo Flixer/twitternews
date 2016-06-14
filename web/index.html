@@ -20,7 +20,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.0/lodash.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script> -->
+    <!--  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script> -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/4.10.3/bootstrap-slider.min.js"></script>
     <script src="http://marvl.infotech.monash.edu/webcola/cola.v3.min.js"></script>
@@ -30,8 +30,9 @@
     <script src="https://cdn.rawgit.com/cytoscape/cytoscape.js-cola/1.1.1/cytoscape-cola.js"></script>
 	
 
-    
+    <script src="pikaday.js"></script>
     <script src="code.js"></script>
+    
   </head>
   <body>
     <div id="cy"></div>
@@ -54,25 +55,38 @@
       <div class="dropdown">
       	<form>
       		Account specific filter:
-      		<select class="dropdown-content" id="allAccounts" onchange="accountSpecific()">
+      		<br><select class="dropdown-content" id="accountSpecificFilterDropdown" onchange="accountSpecificFilter()">
       			<option value=1>Yes</option>
       			<option value=0>No</option>
       		</select>
       		
       	</form>      	
       </div>
-      <div class="AccountDropdown" id="twitterAccountFilter">
+      <div class="dropdown" id="twitterAccountFilter">
       	<form>
       		Account:
-      		<select class="AccountDropdown-content" id="twitterAccountList" onchange="filterTwitterAccounts()" disabled></select>
+      		<br><select class="AccountDropdown-content" id="twitterAccountList" onchange="filterTwitterAccounts()"></select>
       	</form>      	
       </div>
       
-            
-    	<div class="datepicker">
-    		<button onclick="openDatepicker()" class="param button"><font color=black>Date:</font></button>
-    	</div>
+    <div class="datepicker">
+    	<form>
+    		Date from:
+    		<br><input type="text" class="datepicker-content" id="datepickerFrom">
+   		</form>
 	</div>
+	<div class="datepicker">
+    	<form>
+    		Date to:
+    		<br><input type="text" class="datepicker-content" id="datepickerTo">
+   		</form>
+	</div>
+		<div class="apply-filter-button">
+    	<button type="button" onclick="applyFilter()">Apply filter</button>
+	</div>
+     
+	</div>
+   
     
   </body>
 </html>

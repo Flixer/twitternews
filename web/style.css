@@ -52,32 +52,40 @@ p {
 .datepicker {
 	position: relative;
     display: inline-block;
-    margin-bottom: 2em;
+    margin-bottom: 1em;
+}
+
+.datepicker-content {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1em;
+    color: black;
 }
 
 .dropdown {
     position: relative;
     display: inline-block;
-    margin-bottom: 2em;
+    margin-bottom: 1em;
 }
 
 .dropdown-content {
     position: relative;
     display: inline-block;
-    margin-bottom: 2em;
+    margin-bottom: 1em;
     color: black;
 }
 
-.AccountDropdown {
+.apply-filter-button {
     position: relative;
     display: inline-block;
-    margin-bottom: 2em;
+    margin-bottom: 1em;
+    color: black;
 }
 
 .AccountDropdown-content {
     position: relative;
     enable: false;
-    margin-bottom: 2em;
+    margin-bottom: 1em;
     color: black;
 }
 

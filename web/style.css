@@ -49,6 +49,57 @@ p {
   font-size: 0.8em;
 }
 
+.datepicker {
+	position: relative;
+    display: inline-block;
+    margin-bottom: 1em;
+}
+
+.datepicker-content {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1em;
+    color: black;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1em;
+}
+
+.dropdown-content {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1em;
+    color: black;
+}
+
+.apply-filter-button {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1em;
+    color: black;
+}
+
+.AccountDropdown-content {
+    position: relative;
+    enable: false;
+    margin-bottom: 1em;
+    color: black;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {background-color: #f1f1f1}
+
+.show {display:block;}
+
 .param button {
   width: 3em;
   margin-right: 0.25em;

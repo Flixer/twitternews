@@ -2,6 +2,8 @@ var cy;
 var graphData = [];
 var numberOfGraphResLoaded = 0;
 
+//$('#date').datepicker({ });
+
 var graphResDataParser = function(data) {
 	var loadedData = jQuery.parseJSON("[" + data.substr(0, data.length - 2)
 			+ "]");
@@ -13,6 +15,7 @@ var graphResDataParser = function(data) {
 };
 $.get("resources/edges.txt", graphResDataParser, "text");
 $.get("resources/nodes.txt", graphResDataParser, "text");
+
 
 var initCY = (function() { // on dom ready
 
@@ -173,7 +176,6 @@ var initCY = (function() { // on dom ready
 	} ];
 
 	sliders.forEach(makeSlider);
-
 	buttons.forEach(makeButton);
 
 	function makeLayout(opts) {
@@ -257,6 +259,77 @@ var initCY = (function() { // on dom ready
 
 }); // on dom ready
 
+
 $(function() {
 	FastClick.attach(document.body);
 });
+
+
+$(document).ready(function(){
+	// get the account list for the account specific filter
+	$.getJSON("test.json", success = function(data){
+		var options = "";
+		
+		for(var i = 0; i < data.length; i++)
+			{
+				options += "<option value='" + data[i].name + "'>" + data[i].name + "</option>";
+			}
+
+		$("#twitterAccountList").append(options);
+	});
+	
+	//create the datepicker
+	var pickerFrom = new Pikaday({ field: $('#datepickerFrom')[0] });
+	console.log(pickerFrom);
+	
+	var pickerTo = new Pikaday({ field: $('#datepickerTo')[0] });
+	console.log(pickerTo);
+	
+});
+
+// the filter relevant variables
+var accountSpecificFilterList;
+var accountFilter;
+var twitterAccountList;
+var twitterAccount;
+var dateFrom;
+var dateTo;
+
+
+// the Twitter Account Dropdown is only enabled if the search should be account specific
+function accountSpecificFilter(){
+	accountSpecificFilterList = document.getElementById("accountSpecificFilterDropdown");
+	accountFilter = accountSpecificFilterList.options[accountSpecificFilterList.selectedIndex].value;
+	
+	if(accountFilter === "0"){
+		//document.getElementById("twitterAccountFilter").classList.toggle("show")
+		document.getElementById("twitterAccountList").disabled=true;
+	} else {
+		document.getElementById("twitterAccountList").disabled=false;
+	}
+}
+
+// gets the chosen Twitter Account from the Account Dropdown
+function filterTwitterAccounts(){
+	twitterAccountList = document.getElementById("twitterAccountList");
+	twitterAccount = twitterAccountList.options[twitterAccountList.selectedIndex].text;
+	}
+
+function applyFilter(){
+	
+	// TODO: implement the filter functionality and delete the "alert-functionality" 
+	
+	dateFrom = document.getElementById("datepickerFrom").value;
+	dateTo = document.getElementById("datepickerTo").value;
+	
+	if(accountFilter === "1"){
+		alert("The chosen filters are: \r\n" 
+					+ "Account: " + twitterAccount + "\r\n"
+					+ "Date from: " + dateFrom + "\r\n"
+					+ "Date to: " + dateTo)
+	} else {
+		alert("The chosen filters are: \r\n" 
+				+ "Date from: " + dateFrom + "\r\n"
+				+ "Date to: " + dateTo)
+	}
+}

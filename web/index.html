@@ -10,12 +10,17 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/4.10.3/css/bootstrap-slider.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    
     <link href="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
+    
     <link href="style.css" rel="stylesheet" />
+    
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.0/lodash.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <!--  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script> -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/4.10.3/bootstrap-slider.min.js"></script>
     <script src="http://marvl.infotech.monash.edu/webcola/cola.v3.min.js"></script>
@@ -23,10 +28,11 @@
     <script src="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.min.js"></script>
     <script src="https://cdn.rawgit.com/cytoscape/cytoscape.js-qtip/2.2.5/cytoscape-qtip.js"></script>
     <script src="https://cdn.rawgit.com/cytoscape/cytoscape.js-cola/1.1.1/cytoscape-cola.js"></script>
+	
 
-
-    
+    <script src="pikaday.js"></script>
     <script src="code.js"></script>
+    
   </head>
   <body>
     <div id="cy"></div>
@@ -46,6 +52,41 @@
         </p>
       </div>
       
-    </div>
+      <div class="dropdown">
+      	<form>
+      		Account specific filter:
+      		<br><select class="dropdown-content" id="accountSpecificFilterDropdown" onchange="accountSpecificFilter()">
+      			<option value=1>Yes</option>
+      			<option value=0>No</option>
+      		</select>
+      		
+      	</form>      	
+      </div>
+      <div class="dropdown" id="twitterAccountFilter">
+      	<form>
+      		Account:
+      		<br><select class="AccountDropdown-content" id="twitterAccountList" onchange="filterTwitterAccounts()"></select>
+      	</form>      	
+      </div>
+      
+    <div class="datepicker">
+    	<form>
+    		Date from:
+    		<br><input type="text" class="datepicker-content" id="datepickerFrom">
+   		</form>
+	</div>
+	<div class="datepicker">
+    	<form>
+    		Date to:
+    		<br><input type="text" class="datepicker-content" id="datepickerTo">
+   		</form>
+	</div>
+		<div class="apply-filter-button">
+    	<button type="button" onclick="applyFilter()">Apply filter</button>
+	</div>
+     
+	</div>
+   
+    
   </body>
 </html>

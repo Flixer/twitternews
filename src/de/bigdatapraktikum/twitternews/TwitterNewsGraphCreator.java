@@ -132,54 +132,7 @@ public class TwitterNewsGraphCreator {
 	
 	
 
-	// scatter: messaging
-	public static final class VertexGroupMessenger extends MessagingFunction<String, Integer, Tuple2<Integer, Integer>, Integer> {
-		private static final long serialVersionUID = 1L;
-
-		public void sendMessages(Vertex<String, Integer> v) throws Exception {
-			for(Edge<String, Integer> edge : getEdges()) {
-				sendMessageTo(edge.getTarget(), new Tuple2<>(v.f1,
-						edge.getValue()));
-			}
-		}
-	}
-
-	// gather: vertex update
-	public static final class VertexGroupUpdater extends VertexUpdateFunction<String, Integer, Tuple2<Integer, Integer>> {
-		private static final long serialVersionUID = 1L;
-
-		public void updateVertex(Vertex<String, Integer> v, MessageIterator<Tuple2<Integer, Integer>> m) throws Exception {
-			Map<Integer, Integer> receivedGroupsWithScores = new HashMap<Integer, Integer>();
-			
-			
-			for (Tuple2<Integer, Integer> message : m) {
-				Integer group = message.f0;
-				Integer score = message.f1;
-
-				// if it is the first message with the group
-				if (receivedGroupsWithScores.containsKey(group)) {
-					Integer newScore = score + receivedGroupsWithScores.get(group);
-					receivedGroupsWithScores.put(group, newScore);
-				
-				} else {
-					// if group was received before
-					receivedGroupsWithScores.put(group, score);
-				}
-			}
-			if(!receivedGroupsWithScores.isEmpty()) {
-				Integer maxValue = 0;
-				Integer maxGroup = 0;
-				for (Map.Entry<Integer, Integer> entry : receivedGroupsWithScores.entrySet()) {
-					if(entry.getValue() > maxValue) {
-						maxValue = entry.getValue();
-						maxGroup = entry.getKey();
-					}
-				}
-			
-				setNewVertexValue(maxGroup);
-			}
-		}
-	}
+	
 	
 }
 

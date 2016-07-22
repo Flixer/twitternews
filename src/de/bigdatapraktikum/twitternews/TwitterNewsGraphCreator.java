@@ -25,6 +25,7 @@ import org.apache.flink.graph.gsa.Neighbor;
 import org.apache.flink.graph.gsa.SumFunction;
 import org.apache.flink.graph.library.CommunityDetection;
 import org.apache.flink.graph.library.GSAConnectedComponents;
+import org.apache.flink.graph.library.LabelPropagation;
 import org.apache.flink.graph.library.Summarization;
 import org.apache.flink.graph.spargel.MessageIterator;
 import org.apache.flink.graph.spargel.MessagingFunction;
@@ -41,8 +42,8 @@ import de.bigdatapraktikum.twitternews.utils.AppConfig;
 
 // this class creates a co-occurrence graph
 public class TwitterNewsGraphCreator {
-	private static Graph<String, Integer, Integer> graph;
-	private static List<Vertex<String, Integer>> verticleList;
+	private static Graph<String, Long, Double> graph;
+	private static List<Vertex<String, Long>> verticleList;
 
 	public static void main(String[] args) throws Exception {
 			
@@ -83,18 +84,20 @@ public class TwitterNewsGraphCreator {
 				tweetFilter);
 
 		// create the graph
-		DataSet<Tuple3<String, String, Integer>> edges = wordsPerTweet.flatMap(new EdgeMapper()).groupBy(0, 1).sum(2);
+		DataSet<Tuple3<String, String, Double>> edges = wordsPerTweet.flatMap(new EdgeMapper()).groupBy(0, 1).sum(2);
+		
 		graph = Graph.fromTupleDataSet(edges, new ChineseWhisperInitialClassMapper(), env);
 
 		// get the strongest connection between two nodes
-		int maxEdgeCount = graph.getEdges().max(2).collect().get(0).f2;
+		double maxEdgeCount = graph.getEdges().max(2).collect().get(0).f2;
+		
 		graph.getEdges().writeAsFormattedText(AppConfig.RESOURCES_GRAPH_EDGES, WriteMode.OVERWRITE,
-				new TextFormatter<Edge<String, Integer>>() {
+				new TextFormatter<Edge<String, Double>>() {
 					private static final long serialVersionUID = 1L;
 
 					@Override
-					public String format(Edge<String, Integer> value) {
-						float weight = Math.min((float) value.f2 / maxEdgeCount, 1);
+					public String format(Edge<String, Double> value) {
+						double weight = Math.min(value.f2 / maxEdgeCount, 1);
 						int colorIntensityR = (int) (180. + (75 * weight));
 						int colorIntensityG = (int) (180. * (1. - weight));
 						int colorIntensityB = (int) (110. * (1. - weight));
@@ -105,21 +108,24 @@ public class TwitterNewsGraphCreator {
 				});
 
 		// TODO: randomize order of verticles
-		DataSet<Vertex<String, Integer>> v = graph.getVertices()
-				.sortPartition(new KeySelector<Vertex<String, Integer>, Integer>() {
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public Integer getKey(Vertex<String, Integer> value) throws Exception {
-						return (int) (Math.random() * 1000);
-					}
-				}, Order.ASCENDING);
+//		DataSet<Vertex<String, Integer>> v = graph.getVertices()
+//				.sortPartition(new KeySelector<Vertex<String, Integer>, Integer>() {
+//					private static final long serialVersionUID = 1L;
+//
+//					@Override
+//					public Integer getKey(Vertex<String, Integer> value) throws Exception {
+//						return (int) (Math.random() * 1000);
+//					}
+//				}, Order.ASCENDING);
 
 		verticleList = graph.getVertices().collect();
 //		graph.getVertices().print();
-		Graph<String, Integer, Integer> res = graph.runScatterGatherIteration(new VertexGroupUpdater(),
-				new VertexGroupMessenger(), 20);
-		res.getVertices().print();
+//		DataSet<Vertex<String, Integer>> res1 = graph.run(new LabelPropagation<String, Integer, Integer>(3));
+		Graph<String, Long, Double> run1 = graph.run(new CommunityDetection<String>(5, 0.5));
+		run1.getVertices().print();
+//		Graph<String, Integer, Integer> res = graph.runScatterGatherIteration(new VertexGroupUpdater(),
+//				new VertexGroupMessenger(), 10);
+//		
 
 		env.execute();
 	}
@@ -135,32 +141,6 @@ public class TwitterNewsGraphCreator {
 				sendMessageTo(edge.getTarget(), new Tuple2<>(v.f1,
 						edge.getValue()));
 			}
-			
-//			HashMap<Integer, Integer> groupToEdgesWeightSum = new HashMap<>();
-//			Integer maxWeightGroup = null;
-//			for (Edge<String, Integer> edge : getEdges()) {
-//				String edgeTarget = edge.getTarget();
-//				if (edgeTarget.equals(v.getId())) {
-//					edgeTarget = edge.getSource();
-//				}
-//
-//				for (Vertex<String, Integer> verticle : verticleList) {
-//					if (verticle.getId().equals(edgeTarget)) {
-//						int groupId = verticle.getValue();
-//						int edgeWeightSum = edge.getValue();
-//						if (groupToEdgesWeightSum.containsKey(groupId)) {
-//							edgeWeightSum += groupToEdgesWeightSum.get(groupId);
-//						}
-//						groupToEdgesWeightSum.put(groupId, edgeWeightSum);
-//						if (maxWeightGroup == null || groupToEdgesWeightSum.get(maxWeightGroup) < edgeWeightSum) {
-//							maxWeightGroup = groupId;
-//						}
-//						break;
-//					}
-//				}
-//				sendMessageTo(edgeTarget, 0);
-//			}
-//			sendMessageTo(v.getId(), new Integer(maxWeightGroup != null ? maxWeightGroup : v.getValue()));
 		}
 	}
 

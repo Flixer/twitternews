@@ -13,11 +13,11 @@ import de.bigdatapraktikum.twitternews.source.Tweet;
  * This class extracts all unique words for each tweet. A list of irrelevant
  * words can be used to exclude these words from the result set.
  */
-public class EdgeMapper extends RichFlatMapFunction<Tuple2<Tweet, ArrayList<String>>, Tuple3<String, String, Integer>> {
+public class EdgeMapper extends RichFlatMapFunction<Tuple2<Tweet, ArrayList<String>>, Tuple3<String, String, Double>> {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public void flatMap(Tuple2<Tweet, ArrayList<String>> input, Collector<Tuple3<String, String, Integer>> output)
+	public void flatMap(Tuple2<Tweet, ArrayList<String>> input, Collector<Tuple3<String, String, Double>> output)
 			throws Exception {
 		ArrayList<String> words = input.f1;
 
@@ -35,9 +35,9 @@ public class EdgeMapper extends RichFlatMapFunction<Tuple2<Tweet, ArrayList<Stri
 				}
 				// always add lexicographically smaller string first
 				if (w1.compareTo(w2) < 0) {
-					output.collect(new Tuple3<>(w1, w2, 1));
+					output.collect(new Tuple3<>(w1, w2, 1.0));
 				} else {
-					output.collect(new Tuple3<>(w2, w1, 1));
+					output.collect(new Tuple3<>(w2, w1, 1.0));
 				}
 			}
 		}

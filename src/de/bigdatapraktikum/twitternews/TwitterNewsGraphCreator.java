@@ -55,12 +55,6 @@ public class TwitterNewsGraphCreator {
 		env.setParallelism(1);
 		
 		
-		//Test
-//		ArrayList<Integer> test1 = new ArrayList<>();
-//		for (int j = 0; j < 200; j++) {
-//			test1.add((int)(Math.random()*100));
-//		}
-//	
 //		
 //		DataSet<Tuple2<Integer, String>> test = env.fromCollection(test1).map(new MapFunction<Integer, Tuple2<Integer, String>>() {
 //
@@ -107,25 +101,10 @@ public class TwitterNewsGraphCreator {
 					}
 				});
 
-		// TODO: randomize order of verticles
-//		DataSet<Vertex<String, Integer>> v = graph.getVertices()
-//				.sortPartition(new KeySelector<Vertex<String, Integer>, Integer>() {
-//					private static final long serialVersionUID = 1L;
-//
-//					@Override
-//					public Integer getKey(Vertex<String, Integer> value) throws Exception {
-//						return (int) (Math.random() * 1000);
-//					}
-//				}, Order.ASCENDING);
 
 		verticleList = graph.getVertices().collect();
-//		graph.getVertices().print();
-//		DataSet<Vertex<String, Integer>> res1 = graph.run(new LabelPropagation<String, Integer, Integer>(3));
-		Graph<String, Long, Double> run1 = graph.run(new CommunityDetection<String>(5, 0.5));
-		run1.getVertices().print();
-//		Graph<String, Integer, Integer> res = graph.runScatterGatherIteration(new VertexGroupUpdater(),
-//				new VertexGroupMessenger(), 10);
-//		
+		Graph<String, Long, Double> run1 = graph.run(new CommunityDetection<String>(AppConfig.maxIterations, AppConfig.delta));
+		run1.getVertices().print();	
 
 		env.execute();
 	}

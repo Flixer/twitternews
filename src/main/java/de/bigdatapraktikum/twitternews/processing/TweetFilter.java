@@ -2,6 +2,7 @@ package de.bigdatapraktikum.twitternews.processing;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import de.bigdatapraktikum.twitternews.source.Tweet;
 
@@ -26,15 +27,15 @@ public class TweetFilter implements Serializable {
 		return dateFrom;
 	}
 
-	public void setDateFrom(LocalDateTime dateFrom) {
-		this.dateFrom = dateFrom;
+	public void setDateFrom(String dateFrom) {
+		this.dateFrom = LocalDateTime.parse(dateFrom, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 	}
 
 	public LocalDateTime getDateTo() {
 		return dateTo;
 	}
 
-	public void setDateTo(LocalDateTime dateTo) {
-		this.dateTo = dateTo;
+	public void setDateTo(String dateTo) {
+		this.dateTo = LocalDateTime.parse(dateTo, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 	}
 }

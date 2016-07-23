@@ -1,4 +1,4 @@
-package de.bigdatapraktikum.twitternews;
+package de.bigdatapraktikum.twitternews.parts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,12 +22,10 @@ import de.bigdatapraktikum.twitternews.utils.AppConfig;
 
 // this class creates a co-occurrence graph
 public class TwitterNewsGraphCreator {
-	private static Graph<String, Long, Double> graph;
-	private static List<Vertex<String, Long>> verticleList;
+	private Graph<String, Long, Double> graph;
+	private List<Vertex<String, Long>> verticleList;
 
-	public static void main(String[] args) throws Exception {
-
-		TweetFilter tweetFilter = new TweetFilter();
+	public void execute(TweetFilter tweetFilter) throws Exception {
 		// tweetFilter.setDateFrom(LocalDateTime.now().minusDays(7));
 		// tweetFilter.setDateTo(LocalDateTime.now().minusHours(0));
 
@@ -86,7 +84,7 @@ public class TwitterNewsGraphCreator {
 				.run(new CommunityDetection<String>(AppConfig.maxIterations, AppConfig.delta));
 		run1.getVertices().print();
 
-		env.execute();
+		// return env.execute();
 	}
 
 }

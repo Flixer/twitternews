@@ -18,6 +18,7 @@ hs_err_pid*
 bin/
 target/
 tmp/
+.mvn/
 *.tmp
 *.bak
 *.swp
@@ -52,6 +53,6 @@ local.properties
 .springBeans
 # Code Recommenders
 .recommenders/resources/filtered_tweets/1
-resources/filtered_tweets/2
-resources/filtered_tweets/3
-resources/filtered_tweets/4
+src/main/resources/web/resources/filtered_tweets/2
+src/main/resources/web/resources/filtered_tweets/3
+src/main/resources/web/resources/filtered_tweets/4

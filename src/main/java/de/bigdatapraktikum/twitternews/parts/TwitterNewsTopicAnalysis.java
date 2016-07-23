@@ -1,4 +1,4 @@
-package de.bigdatapraktikum.twitternews;
+package de.bigdatapraktikum.twitternews.parts;
 
 import java.util.ArrayList;
 

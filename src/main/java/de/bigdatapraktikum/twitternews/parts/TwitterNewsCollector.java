@@ -1,4 +1,4 @@
-package de.bigdatapraktikum.twitternews;
+package de.bigdatapraktikum.twitternews.parts;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -20,7 +20,7 @@ import twitter4j.Status;
 
 public class TwitterNewsCollector {
 
-	public static void main(String[] args) throws Exception {
+	public void execute() throws Exception {
 		Date lastExecutionDate = new Date(new File(AppConfig.RESOURCES_TWEETS).lastModified());
 
 		// set up the execution environment

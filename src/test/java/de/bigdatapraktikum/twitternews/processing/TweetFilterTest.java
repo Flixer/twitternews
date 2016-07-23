@@ -19,13 +19,13 @@ public class TweetFilterTest {
 		Tweet tweet4 = new Tweet(4, LocalDateTime.of(2014, 5, 20, 0, 0), "SOURCE", "A C D", 1);
 
 		TweetFilter filter = new TweetFilter();
-		filter.setDateFrom(LocalDateTime.of(2016, 4, 20, 0, 0));
+		filter.setDateFrom("2016-04-20 00:00:00");
 		assertTrue(filter.isValidTweet(tweet1));
 		assertTrue(filter.isValidTweet(tweet2));
 		assertTrue(filter.isValidTweet(tweet3));
 		assertFalse(filter.isValidTweet(tweet4));
 
-		filter.setDateTo(LocalDateTime.of(2016, 5, 20, 0, 0));
+		filter.setDateTo("2016-05-20 00:00:00");
 		assertTrue(filter.isValidTweet(tweet1));
 		assertFalse(filter.isValidTweet(tweet2));
 		assertTrue(filter.isValidTweet(tweet3));

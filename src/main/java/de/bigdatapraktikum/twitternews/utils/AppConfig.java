@@ -1,6 +1,9 @@
 package de.bigdatapraktikum.twitternews.utils;
 
 public class AppConfig {
+	public static final int STATUS_OK = 200;
+	public static final int STATUS_INTERNAL_ERROR = 500;
+
 	// deprecated
 	public static final double MAX_IDF_VALUE = 2.0;
 	public static final int NUMBER_OF_NODES = 50;
@@ -8,10 +11,10 @@ public class AppConfig {
 	public static final int maxIterations = 5;
 	public static final double delta = 0.5;
 
-	public static final String RESOURCES_TWEETS = "web/resources/tweets.txt";
-	public static final String RESOURCES_TWEETS_FILTERED = "web/resources/filtered_tweets";
-	public static final String RESOURCES_GRAPH_NODES = "web/resources/nodes.txt";
-	public static final String RESOURCES_GRAPH_EDGES = "web/resources/edges.txt";
+	public static final String RESOURCES_TWEETS = "src/main/resources/web/resources/tweets.txt";
+	public static final String RESOURCES_TWEETS_FILTERED = "src/main/resources/web/resources/filtered_tweets";
+	public static final String RESOURCES_GRAPH_NODES = "src/main/resources/web/resources/nodes.txt";
+	public static final String RESOURCES_GRAPH_EDGES = "src/main/resources/web/resources/edges.txt";
 
 	public static final String[] TWITTER_ACCOUNTS_TO_CRAWL = new String[] { "faznet", "SPIEGELONLINE", "SZ",
 			"jungewelt" };

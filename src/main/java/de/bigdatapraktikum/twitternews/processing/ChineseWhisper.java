@@ -8,31 +8,30 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.GraphAlgorithm;
 import org.apache.flink.graph.Vertex;
-
 import org.apache.flink.graph.spargel.MessageIterator;
 import org.apache.flink.graph.spargel.MessagingFunction;
 import org.apache.flink.graph.spargel.VertexUpdateFunction;
 
 public class ChineseWhisper<K> implements GraphAlgorithm<K, Long, Double, Graph<K, Long, Double>> {
-	
+
 	private Integer maxIterations;
 
-	
 	public ChineseWhisper(Integer maxIterations) {
 		this.maxIterations = maxIterations;
-//		Graph<String, Integer, Integer> res = graph.runScatterGatherIteration(new VertexGroupUpdater(),
-//		new VertexGroupMessenger(), 10);
+		// Graph<String, Integer, Integer> res =
+		// graph.runScatterGatherIteration(new VertexGroupUpdater(),
+		// new VertexGroupMessenger(), 10);
 	}
-	
+
 	@Override
 	public Graph<K, Long, Double> run(Graph<K, Long, Double> graph) throws Exception {
-		
-		return graph.runScatterGatherIteration(new VertexGroupUpdater<K>(), new VertexGroupMessenger<K>(), maxIterations);
+
+		return graph.runScatterGatherIteration(new VertexGroupUpdater<K>(), new VertexGroupMessenger<K>(),
+				maxIterations);
 	}
-	
+
 	// scatter: messaging
-	public static final class VertexGroupMessenger<K>
-			extends MessagingFunction<K, Long, Tuple2<Long, Double>, Double> {
+	public static final class VertexGroupMessenger<K> extends MessagingFunction<K, Long, Tuple2<Long, Double>, Double> {
 		private static final long serialVersionUID = 1L;
 
 		public void sendMessages(Vertex<K, Long> v) throws Exception {
@@ -79,5 +78,4 @@ public class ChineseWhisper<K> implements GraphAlgorithm<K, Long, Double, Graph<
 		}
 	}
 
-	
 }

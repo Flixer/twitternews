@@ -52,19 +52,19 @@ public class EdgeMapperTest extends DataSetTestBase {
 		DataSet<Tuple2<Tweet, ArrayList<String>>> tweetListDataSet = createTestDataSet(tweetList);
 
 		// execute EdgeMapper and get result
-		FlatMapOperator<Tuple2<Tweet, ArrayList<String>>, Tuple3<String, String, Integer>> actual = tweetListDataSet
+		FlatMapOperator<Tuple2<Tweet, ArrayList<String>>, Tuple3<String, String, Double>> actual = tweetListDataSet
 				.flatMap(new EdgeMapper());
 
 		// define expected result
-		ArrayList<Tuple3<String, String, Integer>> expectedArrayList = new ArrayList<>();
-		expectedArrayList.add(new Tuple3<String, String, Integer>("A", "B", 1));
-		expectedArrayList.add(new Tuple3<String, String, Integer>("A", "C", 1));
-		expectedArrayList.add(new Tuple3<String, String, Integer>("B", "C", 1));
-		expectedArrayList.add(new Tuple3<String, String, Integer>("A", "B", 1));
-		expectedArrayList.add(new Tuple3<String, String, Integer>("A", "C", 1));
-		expectedArrayList.add(new Tuple3<String, String, Integer>("A", "D", 1));
-		expectedArrayList.add(new Tuple3<String, String, Integer>("C", "D", 1));
-		ExpectedRecords<Tuple3<String, String, Integer>> expected = new ExpectedRecords<Tuple3<String, String, Integer>>()
+		ArrayList<Tuple3<String, String, Double>> expectedArrayList = new ArrayList<>();
+		expectedArrayList.add(new Tuple3<String, String, Double>("A", "B", 1.));
+		expectedArrayList.add(new Tuple3<String, String, Double>("A", "C", 1.));
+		expectedArrayList.add(new Tuple3<String, String, Double>("B", "C", 1.));
+		expectedArrayList.add(new Tuple3<String, String, Double>("A", "B", 1.));
+		expectedArrayList.add(new Tuple3<String, String, Double>("A", "C", 1.));
+		expectedArrayList.add(new Tuple3<String, String, Double>("A", "D", 1.));
+		expectedArrayList.add(new Tuple3<String, String, Double>("C", "D", 1.));
+		ExpectedRecords<Tuple3<String, String, Double>> expected = new ExpectedRecords<Tuple3<String, String, Double>>()
 				.expectAll(expectedArrayList);
 
 		// assert actual and expected dataset

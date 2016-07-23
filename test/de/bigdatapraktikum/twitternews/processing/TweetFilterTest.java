@@ -24,7 +24,7 @@ public class TweetFilterTest {
 		assertTrue(filter.isValidTweet(tweet2));
 		assertTrue(filter.isValidTweet(tweet3));
 		assertFalse(filter.isValidTweet(tweet4));
-		
+
 		filter.setDateTo(LocalDateTime.of(2016, 5, 20, 0, 0));
 		assertTrue(filter.isValidTweet(tweet1));
 		assertFalse(filter.isValidTweet(tweet2));

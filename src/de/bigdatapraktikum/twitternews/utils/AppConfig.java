@@ -3,8 +3,8 @@ package de.bigdatapraktikum.twitternews.utils;
 public class AppConfig {
 	// deprecated
 	public static final double MAX_IDF_VALUE = 2.0;
-	public static final int NUMBER_OF_NODES= 50;
-	
+	public static final int NUMBER_OF_NODES = 50;
+
 	public static final int maxIterations = 5;
 	public static final double delta = 0.5;
 

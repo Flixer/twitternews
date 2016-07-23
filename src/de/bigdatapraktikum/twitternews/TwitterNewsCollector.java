@@ -43,8 +43,7 @@ public class TwitterNewsCollector {
 			@Override
 			public void invoke(Tweet tweet) throws Exception {
 				OutputStreamWriter fileWritter = new OutputStreamWriter(
-						new FileOutputStream(AppConfig.RESOURCES_TWEETS, true),
-						Charset.forName("UTF-8").newEncoder());
+						new FileOutputStream(AppConfig.RESOURCES_TWEETS, true), Charset.forName("UTF-8").newEncoder());
 				BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
 				bufferWritter.write(tweet.toString());
 				bufferWritter.newLine();

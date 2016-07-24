@@ -3,6 +3,7 @@ package de.bigdatapraktikum.twitternews.parts;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.io.TextOutputFormat.TextFormatter;
@@ -13,6 +14,7 @@ import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.library.CommunityDetection;
+import org.apache.flink.util.Collector;
 
 import de.bigdatapraktikum.twitternews.processing.EdgeMapper;
 import de.bigdatapraktikum.twitternews.processing.InitialNodeClassMapper;
@@ -83,16 +85,42 @@ public class TwitterNewsGraphCreator {
 		Graph<String, Long, Double> graphWithClusterId = graph
 				.run(new CommunityDetection<String>(AppConfig.maxIterations, AppConfig.delta));
 
-		graphWithClusterId.getVertices().writeAsFormattedText(AppConfig.RESOURCES_GRAPH_CLUSTER, WriteMode.OVERWRITE,
-				new TextFormatter<Vertex<String, Long>>() {
+		DataSet<Tuple2<Long, ArrayList<String>>> groupsWithWords = graphWithClusterId.getVertices().groupBy(1)
+				.reduceGroup(new GroupReduceFunction<Vertex<String, Long>, Tuple2<Long, ArrayList<String>>>() {
 					private static final long serialVersionUID = 1L;
 
 					@Override
-					public String format(Vertex<String, Long> value) {
-						return "{\"name\": " + value.f0 + ", \"group\": " + value.f1 + "},";
+					public void reduce(Iterable<Vertex<String, Long>> values,
+							Collector<Tuple2<Long, ArrayList<String>>> out) throws Exception {
+
+						Long group = null;
+						ArrayList<String> wordList = new ArrayList<>();
+						for (Tuple2<String, Long> t : values) {
+							group = t.f1;
+							wordList.add(t.f0);
+						}
+						out.collect(new Tuple2<Long, ArrayList<String>>(group, wordList));
 					}
 				});
+		groupsWithWords.writeAsFormattedText(AppConfig.RESOURCES_GRAPH_CLUSTER, WriteMode.OVERWRITE,
+				new TextFormatter<Tuple2<Long, ArrayList<String>>>() {
+					private static final long serialVersionUID = 1L;
 
+					@Override
+					public String format(Tuple2<Long, ArrayList<String>> value) {
+						String s = "{\"group\": " + value.f0 + ", \"member\": [";
+						boolean first = true;
+						for (String word : value.f1) {
+							if (first) {
+								first = false;
+								s += "\"" + word + "\"";
+							}
+							s += ",\"" + word + "\"";
+						}
+						s += "]}";
+						return s;
+					}
+				});
 		env.execute();
 	}
 

@@ -114,8 +114,9 @@ public class TwitterNewsGraphCreator {
 							if (first) {
 								first = false;
 								s += "\"" + word + "\"";
+							} else {
+								s += ",\"" + word + "\"";
 							}
-							s += ",\"" + word + "\"";
 						}
 						s += "]}";
 						return s;

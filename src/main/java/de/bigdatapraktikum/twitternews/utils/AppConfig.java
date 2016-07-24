@@ -15,6 +15,7 @@ public class AppConfig {
 	public static final String RESOURCES_TWEETS_FILTERED = "src/main/resources/web/resources/filtered_tweets";
 	public static final String RESOURCES_GRAPH_NODES = "src/main/resources/web/resources/nodes.txt";
 	public static final String RESOURCES_GRAPH_EDGES = "src/main/resources/web/resources/edges.txt";
+	public static final String RESOURCES_GRAPH_CLUSTER = "src/main/resources/web/resources/cluster.txt";
 
 	public static final String[] TWITTER_ACCOUNTS_TO_CRAWL = new String[] { "faznet", "SPIEGELONLINE", "SZ",
 			"jungewelt" };

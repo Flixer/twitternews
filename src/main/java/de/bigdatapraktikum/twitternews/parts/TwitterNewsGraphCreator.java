@@ -14,8 +14,8 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.library.CommunityDetection;
 
-import de.bigdatapraktikum.twitternews.processing.ChineseWhisperInitialClassMapper;
 import de.bigdatapraktikum.twitternews.processing.EdgeMapper;
+import de.bigdatapraktikum.twitternews.processing.InitialNodeClassMapper;
 import de.bigdatapraktikum.twitternews.processing.TweetFilter;
 import de.bigdatapraktikum.twitternews.source.Tweet;
 import de.bigdatapraktikum.twitternews.utils.AppConfig;
@@ -58,7 +58,7 @@ public class TwitterNewsGraphCreator {
 		// create the graph
 		DataSet<Tuple3<String, String, Double>> edges = wordsPerTweet.flatMap(new EdgeMapper()).groupBy(0, 1).sum(2);
 
-		graph = Graph.fromTupleDataSet(edges, new ChineseWhisperInitialClassMapper(), env);
+		graph = Graph.fromTupleDataSet(edges, new InitialNodeClassMapper(), env);
 
 		// get the strongest connection between two nodes
 		double maxEdgeCount = graph.getEdges().max(2).collect().get(0).f2;
@@ -80,11 +80,20 @@ public class TwitterNewsGraphCreator {
 				});
 
 		verticleList = graph.getVertices().collect();
-		Graph<String, Long, Double> run1 = graph
+		Graph<String, Long, Double> graphWithClusterId = graph
 				.run(new CommunityDetection<String>(AppConfig.maxIterations, AppConfig.delta));
-		run1.getVertices().print();
 
-		// return env.execute();
+		graphWithClusterId.getVertices().writeAsFormattedText(AppConfig.RESOURCES_GRAPH_CLUSTER, WriteMode.OVERWRITE,
+				new TextFormatter<Vertex<String, Long>>() {
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public String format(Vertex<String, Long> value) {
+						return "{\"name\": " + value.f0 + ", \"group\": " + value.f1 + "},";
+					}
+				});
+
+		env.execute();
 	}
 
 }

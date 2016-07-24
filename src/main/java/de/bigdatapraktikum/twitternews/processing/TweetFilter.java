@@ -11,12 +11,16 @@ public class TweetFilter implements Serializable {
 
 	private LocalDateTime dateFrom = null;
 	private LocalDateTime dateTo = null;
+	private String source = null;
 
 	public boolean isValidTweet(Tweet tweet) {
 		if (dateFrom != null && tweet.getPublishedAt().isBefore(dateFrom)) {
 			return false;
 		}
 		if (dateTo != null && tweet.getPublishedAt().isAfter(dateTo)) {
+			return false;
+		}
+		if (source != null && (tweet.getSource() == null || !tweet.getSource().equals(source))) {
 			return false;
 		}
 
@@ -37,5 +41,13 @@ public class TweetFilter implements Serializable {
 
 	public void setDateTo(String dateTo) {
 		this.dateTo = LocalDateTime.parse(dateTo, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
 	}
 }

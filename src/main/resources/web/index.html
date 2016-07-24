@@ -1,92 +1,96 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset=utf-8 />
-    <meta name="viewport" content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
-    
-    <title>Cola.js/Cytoscape.js</title>
-    
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/4.10.3/css/bootstrap-slider.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
-    
-    <link href="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
-    
-    <link href="style.css" rel="stylesheet" />
-    
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.0/lodash.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-    <!--  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script> -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/4.10.3/bootstrap-slider.min.js"></script>
-    <script src="http://marvl.infotech.monash.edu/webcola/cola.v3.min.js"></script>
-    <script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.min.js"></script>
-    <script src="https://cdn.rawgit.com/cytoscape/cytoscape.js-qtip/2.2.5/cytoscape-qtip.js"></script>
-    <script src="https://cdn.rawgit.com/cytoscape/cytoscape.js-cola/1.1.1/cytoscape-cola.js"></script>
-	
+<head>
+<meta charset=utf-8 />
+<meta name="viewport"
+	content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
 
-    <script src="pikaday.js"></script>
-    <script src="code.js"></script>
-    
-  </head>
-  <body>
-    <div id="cy"></div>
-    
-    <span class="fa fa-bars config-toggle" id="config-toggle"></span>
-    
-    <div id="config" class="config">
-      
-      <div class="preamble">
-        <span class="label label-info">Cola.js/Cytoscape.js demo</span>
+<title>Twitter News Analysis</title>
 
-        <p>This is a demo of a graph of gene-gene interactions that uses Cola.js for layout and Cytoscape.js for its graph model and visualisation.  Use the controls below to alter the Cola.js layout parameters.</p>
-        <p>
-          Data by <a href="http://genemania.org">GeneMANIA</a><br/>
-          Visualisation by <a href="http://js.cytoscape.org">Cytoscape.js</a><br/>
-          Layout by <a href="http://marvl.infotech.monash.edu/webcola/">Cola.js</a>
-        </p>
-      </div>
-      
-      <div class="dropdown">
-      	<form>
-      		Account specific filter:
-      		<br><select class="dropdown-content" id="accountSpecificFilterDropdown" onchange="accountSpecificFilter()">
-      			<option value=1>Yes</option>
-      			<option value=0>No</option>
-      		</select>
-      		
-      	</form>      	
-      </div>
-      <div class="dropdown" id="twitterAccountFilter">
-      	<form>
-      		Account:
-      		<br><select class="AccountDropdown-content" id="twitterAccountList" onchange="filterTwitterAccounts()"></select>
-      	</form>      	
-      </div>
-      
-    <div class="datepicker">
-    	<form>
-    		Date from:
-    		<br><input type="text" class="datepicker-content" id="datepickerFrom">
-   		</form>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/4.10.3/css/bootstrap-slider.min.css">
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+<link rel="stylesheet"
+	href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+<link
+	href="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.min.css"
+	rel="stylesheet" type="text/css" />
+<link href='https://fonts.googleapis.com/css?family=Lato'
+	rel='stylesheet' type='text/css'>
+<link href="style.css" rel="stylesheet" />
+
+
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.0/lodash.min.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<!--  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script> -->
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/4.10.3/bootstrap-slider.min.js"></script>
+<script src="http://marvl.infotech.monash.edu/webcola/cola.v3.min.js"></script>
+<script
+	src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>
+<script
+	src="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.min.js"></script>
+<script
+	src="https://cdn.rawgit.com/cytoscape/cytoscape.js-qtip/2.2.5/cytoscape-qtip.js"></script>
+<script
+	src="https://cdn.rawgit.com/cytoscape/cytoscape.js-cola/1.1.1/cytoscape-cola.js"></script>
+<script type="text/javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js"></script>
+<script src="jquery.blockUI.js"></script>
+<script src="pikaday.js"></script>
+<script src="code.js"></script>
+
+</head>
+<body>
+	<div id="cy"></div>
+	<span class="fa fa-bars config-toggle" id="config-toggle"></span>
+	<div id="config" class="config">
+		<div class="preamble">
+			<span class="label label-info">Twitter News Analysis</span>
+			<p>Themenanalyse von Nachrichtendiensten mittels Twitter.</p>
+		</div>
+
+		<form>
+			<div class="dropdown">
+				Nachrichtendienstspezifisch: <br> <select
+					class="dropdown-content" id="accountSpecificFilterDropdown"
+					onchange="accountSpecificFilter()">
+					<option value="1">Ja</option>
+					<option value="0" selected>Nein</option>
+				</select>
+			</div>
+			<div class="dropdown" id="twitterAccountFilter"
+				style="display: none;">
+				Nachrichtendienst: <br> <select class="AccountDropdown-content"
+					id="twitterAccountList"></select>
+			</div>
+
+			<div class="datepicker">
+				Zeitraum von: <br> <input type="text"
+					class="datepicker-content" id="datepickerFrom">
+			</div>
+			<div class="datepicker">
+				Zeitraum bis: <br> <input type="text"
+					class="datepicker-content" id="datepickerTo">
+			</div>
+			<div class="apply-filter-button">
+				<button type="button" onclick="applyFilter()">Apply filter</button>
+			</div>
+		</form>
+
 	</div>
-	<div class="datepicker">
-    	<form>
-    		Date to:
-    		<br><input type="text" class="datepicker-content" id="datepickerTo">
-   		</form>
-	</div>
-		<div class="apply-filter-button">
-    	<button type="button" onclick="applyFilter()">Apply filter</button>
-	</div>
-     
-	</div>
-   
-    
-  </body>
+
+
+</body>
 </html>

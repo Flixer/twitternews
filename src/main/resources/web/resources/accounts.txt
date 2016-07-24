@@ -1,0 +1,6 @@
+[
+	{"name": "FAZ.NET"},
+	{"name": "SPIEGEL ONLINE"},
+	{"name": "Süddeutsche Zeitung"},
+	{"name": "junge Welt"}
+]

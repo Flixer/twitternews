@@ -2,7 +2,12 @@ var cy;
 var graphData = [];
 var numberOfGraphResLoaded = 0;
 
-//$('#date').datepicker({ });
+function reloadInformation() {
+	numberOfGraphResLoaded = 0;
+	graphData = [];
+	$.get("resources/edges.txt", graphResDataParser, "text");
+	$.get("resources/nodes.txt", graphResDataParser, "text");
+}
 
 var graphResDataParser = function(data) {
 	var loadedData = jQuery.parseJSON("[" + data.substr(0, data.length - 2)
@@ -13,9 +18,6 @@ var graphResDataParser = function(data) {
 		initCY();
 	}
 };
-$.get("resources/edges.txt", graphResDataParser, "text");
-$.get("resources/nodes.txt", graphResDataParser, "text");
-
 
 var initCY = (function() { // on dom ready
 
@@ -139,8 +141,10 @@ var initCY = (function() { // on dom ready
 
 	layout.run();
 
+	$('#config .param').remove();
 	var $config = $('#config');
 	var $btnParam = $('<div class="param"></div>');
+	
 	$config.append($btnParam);
 
 	var sliders = [ {
@@ -259,77 +263,79 @@ var initCY = (function() { // on dom ready
 
 }); // on dom ready
 
-
 $(function() {
 	FastClick.attach(document.body);
 });
 
+reloadInformation();
+$(document).ready(
+		function() {
+			// get the account list for the account specific filter
+			$.getJSON("resources/accounts.txt", success = function(data) {
+				var options = "";
 
-$(document).ready(function(){
-	// get the account list for the account specific filter
-	$.getJSON("test.json", success = function(data){
-		var options = "";
-		
-		for(var i = 0; i < data.length; i++)
-			{
-				options += "<option value='" + data[i].name + "'>" + data[i].name + "</option>";
-			}
+				for (var i = 0; i < data.length; i++) {
+					options += "<option value='" + data[i].name + "'>"
+							+ data[i].name + "</option>";
+				}
 
-		$("#twitterAccountList").append(options);
-	});
-	
-	//create the datepicker
-	var pickerFrom = new Pikaday({ field: $('#datepickerFrom')[0] });
-	console.log(pickerFrom);
-	
-	var pickerTo = new Pikaday({ field: $('#datepickerTo')[0] });
-	console.log(pickerTo);
-	
-});
+				$("#twitterAccountList").append(options);
+			});
 
-// the filter relevant variables
-var accountSpecificFilterList;
-var accountFilter;
-var twitterAccountList;
-var twitterAccount;
-var dateFrom;
-var dateTo;
+			// create the datepicker
+			var pickerFrom = new Pikaday({
+				field : $('#datepickerFrom')[0],
+				format : 'YYYY-MM-DD',
+			});
+			// console.log(pickerFrom);
 
+			var pickerTo = new Pikaday({
+				field : $('#datepickerTo')[0],
+				format : 'YYYY-MM-DD',
+			});
+			// console.log(pickerTo);
 
-// the Twitter Account Dropdown is only enabled if the search should be account specific
-function accountSpecificFilter(){
-	accountSpecificFilterList = document.getElementById("accountSpecificFilterDropdown");
-	accountFilter = accountSpecificFilterList.options[accountSpecificFilterList.selectedIndex].value;
-	
-	if(accountFilter === "0"){
-		//document.getElementById("twitterAccountFilter").classList.toggle("show")
-		document.getElementById("twitterAccountList").disabled=true;
+			accountSpecificFilter();
+		});
+
+// the Twitter Account Dropdown is only enabled if the search should be account
+// specific
+function accountSpecificFilter() {
+	if ($("#accountSpecificFilterDropdown").val() === "0") {
+		$("#twitterAccountFilter").hide();
 	} else {
-		document.getElementById("twitterAccountList").disabled=false;
+		$("#twitterAccountFilter").show();
 	}
 }
 
-// gets the chosen Twitter Account from the Account Dropdown
-function filterTwitterAccounts(){
-	twitterAccountList = document.getElementById("twitterAccountList");
-	twitterAccount = twitterAccountList.options[twitterAccountList.selectedIndex].text;
+function applyFilter() {
+	var dateFrom = $("#datepickerFrom").val();
+	var dateTo = $("#datepickerTo").val();
+
+	var url = "/analyze?";
+	if ($("#accountSpecificFilterDropdown").val() === "1") {
+		url += "source=" + $("#twitterAccountList").val() + "&";
+	}
+	if (dateFrom) {
+		url += "dateFrom=" + dateFrom + " 00:00:00&";
+	}
+	if (dateTo) {
+		url += "dateTo=" + dateTo + " 23:59:59&";
 	}
 
-function applyFilter(){
-	
-	// TODO: implement the filter functionality and delete the "alert-functionality" 
-	
-	dateFrom = document.getElementById("datepickerFrom").value;
-	dateTo = document.getElementById("datepickerTo").value;
-	
-	if(accountFilter === "1"){
-		alert("The chosen filters are: \r\n" 
-					+ "Account: " + twitterAccount + "\r\n"
-					+ "Date from: " + dateFrom + "\r\n"
-					+ "Date to: " + dateTo)
-	} else {
-		alert("The chosen filters are: \r\n" 
-				+ "Date from: " + dateFrom + "\r\n"
-				+ "Date to: " + dateTo)
-	}
+	var loadingText = '<div class="cssload-loader"><div class="cssload-inner cssload-one"></div><div class="cssload-inner cssload-two"></div><div class="cssload-inner cssload-three"></div></div><h1>Twitter Daten werden analyisiert...</h1>';
+	$.blockUI({
+		message : loadingText
+	});
+	$.get(url, function(res) {
+		if (res != "200") {
+			alert("Es ist ein Fehler aufgetreten");
+		} else {
+			reloadInformation();
+		}
+		$.unblockUI();
+	}).fail(function() {
+		alert("Es ist ein Fehler aufgetreten");
+		$.unblockUI();
+	});
 }

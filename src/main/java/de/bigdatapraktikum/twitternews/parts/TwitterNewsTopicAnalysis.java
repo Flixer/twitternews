@@ -1,14 +1,10 @@
 package de.bigdatapraktikum.twitternews.parts;
 
-import java.util.ArrayList;
-
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.io.TextOutputFormat.TextFormatter;
 import org.apache.flink.api.java.operators.DataSource;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -24,8 +20,8 @@ import de.bigdatapraktikum.twitternews.source.Tweet;
 import de.bigdatapraktikum.twitternews.utils.AppConfig;
 
 public class TwitterNewsTopicAnalysis {
-	public DataSet<Tuple2<Tweet, ArrayList<String>>> getFilteredWordsInTweets(ExecutionEnvironment env,
-			TweetFilter filter) throws Exception {
+	public DataSet<Tuple2<Tweet, String>> getFilteredWordsInTweets(ExecutionEnvironment env, TweetFilter filter)
+			throws Exception {
 
 		// get input data from previously stored twitter data
 		DataSource<String> tweetStrings = env.readTextFile(AppConfig.RESOURCES_TWEETS, "UTF-8");
@@ -115,40 +111,8 @@ public class TwitterNewsTopicAnalysis {
 		// tweet and aggregate all topic words in an ArrayList. The final result
 		// is a dataset with tweets and a list of all topic words within that
 		// tweet
-		DataSet<Tuple2<Tweet, ArrayList<String>>> wordsPerTweet = uniqueWordsinTweets.join(filteredIdfValues).where(1)
-				.equalTo(0).with(new UniqueWordsIdfJoin()).groupBy(new KeySelector<Tuple2<Tweet, String>, Long>() {
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public Long getKey(Tuple2<Tweet, String> value) throws Exception {
-						return value.f0.getId();
-					}
-				}).reduceGroup(new GroupReduceFunction<Tuple2<Tweet, String>, Tuple2<Tweet, ArrayList<String>>>() {
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public void reduce(Iterable<Tuple2<Tweet, String>> values,
-							Collector<Tuple2<Tweet, ArrayList<String>>> out) throws Exception {
-						// reduce data like that:
-						// ------------------------
-						// tweet-1 -> word1
-						// tweet-1 -> word2
-						// tweet-2 -> word1
-						//
-						// to:
-						// ------------------------
-						// tweet-1 -> (word1, word2)
-						// tweet-2 -> (word1)
-
-						Tweet tweet = null;
-						ArrayList<String> wordList = new ArrayList<>();
-						for (Tuple2<Tweet, String> t : values) {
-							tweet = t.f0;
-							wordList.add(t.f1);
-						}
-						out.collect(new Tuple2<Tweet, ArrayList<String>>(tweet, wordList));
-					}
-				});
+		DataSet<Tuple2<Tweet, String>> wordsPerTweet = uniqueWordsinTweets.join(filteredIdfValues).where(1).equalTo(0)
+				.with(new UniqueWordsIdfJoin());
 		// wordsPerTweet.print();
 
 		return wordsPerTweet;

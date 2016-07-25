@@ -166,45 +166,58 @@ public class TwitterNewsGraphCreator {
 					}
 
 				});
-		// groupsWithWords.join(sourceGroupSize).where(0).equalTo(1).groupBy("f0.f0").reduceGroup(
-		// new GroupReduceFunction<Tuple2<Tuple2<Long,
-		// ArrayList<String>>, Tuple3<String, Long, Long>>, Tuple3<Long,
-		// ArrayList<String>, Tuple2<String, Long>>>() {
-		// private static final long serialVersionUID = 1L;
-		//
-		// @Override
-		// public void reduce(
-		// Iterable<Tuple2<Tuple2<Long, ArrayList<String>>,
-		// Tuple3<String, Long, Long>>> values,
-		// Collector<Tuple3<Long, ArrayList<String>, Tuple2<String,
-		// Long>>> out) throws Exception {
-		//
-		// for (Tuple2<Tuple2<Long, ArrayList<String>>, Tuple3<String,
-		// Long, Long>> v : values) {
-		//
-		// }
-		//
-		// }
-		//
-		// });
+		DataSet<Tuple3<Long, ArrayList<String>, ArrayList<Tuple2<String, Long>>>> groupsWithWordsAndSources = groupsWithWords
+				.join(sourceGroupSize).where(0).equalTo(1).groupBy("f0.f0").reduceGroup(
+						new GroupReduceFunction<Tuple2<Tuple2<Long, ArrayList<String>>, Tuple3<String, Long, Long>>, Tuple3<Long, ArrayList<String>, ArrayList<Tuple2<String, Long>>>>() {
+							private static final long serialVersionUID = 1L;
 
-		groupsWithWords.writeAsFormattedText(AppConfig.RESOURCES_GRAPH_CLUSTER, WriteMode.OVERWRITE,
-				new TextFormatter<Tuple2<Long, ArrayList<String>>>() {
+							@Override
+							public void reduce(
+									Iterable<Tuple2<Tuple2<Long, ArrayList<String>>, Tuple3<String, Long, Long>>> values,
+									Collector<Tuple3<Long, ArrayList<String>, ArrayList<Tuple2<String, Long>>>> out)
+									throws Exception {
+								Long groupId = null;
+								ArrayList<String> wordList = new ArrayList<>();
+								ArrayList<Tuple2<String, Long>> sourcesList = new ArrayList<>();
+								for (Tuple2<Tuple2<Long, ArrayList<String>>, Tuple3<String, Long, Long>> v : values) {
+									sourcesList.add(new Tuple2<String, Long>(v.f1.f0, v.f1.f2));
+									wordList = v.f0.f1;
+									groupId = v.f0.f0;
+								}
+
+								out.collect(new Tuple3<Long, ArrayList<String>, ArrayList<Tuple2<String, Long>>>(
+										groupId, wordList, sourcesList));
+							}
+
+						});
+
+		groupsWithWordsAndSources.writeAsFormattedText(AppConfig.RESOURCES_GRAPH_CLUSTER, WriteMode.OVERWRITE,
+				new TextFormatter<Tuple3<Long, ArrayList<String>, ArrayList<Tuple2<String, Long>>>>() {
 					private static final long serialVersionUID = 1L;
 
 					@Override
-					public String format(Tuple2<Long, ArrayList<String>> value) {
-						String s = "{\"group\": " + value.f0 + ", \"member\": [";
+					public String format(Tuple3<Long, ArrayList<String>, ArrayList<Tuple2<String, Long>>> value) {
+						String s = "{\"group\": " + value.f0 + ", \"words\": [";
 						boolean first = true;
 						for (String word : value.f1) {
 							if (first) {
 								first = false;
-								s += "\"" + word + "\"";
 							} else {
-								s += ",\"" + word + "\"";
+								s += ",";
 							}
+							s += "\"" + word + "\"";
 						}
-						s += "]}";
+						s += "], \"sources\": [";
+						first = true;
+						for (Tuple2<String, Long> source : value.f2) {
+							if (first) {
+								first = false;
+							} else {
+								s += ",";
+							}
+							s += "{\"name\": \"" + source.f0 + "\", \"count\": " + source.f1 + "}";
+						}
+						s += "]}, ";
 						return s;
 					}
 				});

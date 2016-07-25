@@ -2,7 +2,6 @@ package de.bigdatapraktikum.twitternews.parts;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
@@ -27,33 +26,11 @@ import de.bigdatapraktikum.twitternews.utils.AppConfig;
 
 // this class creates a co-occurrence graph
 public class TwitterNewsGraphCreator {
-	private Graph<String, Long, Double> graph;
-	private List<Vertex<String, Long>> verticleList;
-
 	public void execute(TweetFilter tweetFilter) throws Exception {
-		// tweetFilter.setDateFrom(LocalDateTime.now().minusDays(7));
-		// tweetFilter.setDateTo(LocalDateTime.now().minusHours(0));
+		// TODO: add more comments to explain what is happening in this class
 
 		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 		env.setParallelism(1);
-
-		//
-		// DataSet<Tuple2<Integer, String>> test =
-		// env.fromCollection(test1).map(new MapFunction<Integer,
-		// Tuple2<Integer, String>>() {
-		//
-		// @Override
-		// public Tuple2<Integer, String> map(Integer arg0) throws Exception {
-		// // TODO Auto-generated method stub
-		// return new Tuple2<>(arg0, "Test" + arg0);
-		// }
-		// });
-		// test.sortPartition(0, Order.ASCENDING).print();
-
-		// returns the co-occurrence graph with the help of the
-		// TwitterNewsTopicAnalysis
-		// public Graph<String, NullValue, Integer> getCoOccurrenceGraph()
-		// throws Exception{
 
 		// get the filtered tweets
 		TwitterNewsTopicAnalysis twitterNewsTopicAnalysis = new TwitterNewsTopicAnalysis();
@@ -99,7 +76,7 @@ public class TwitterNewsGraphCreator {
 		DataSet<Tuple3<String, String, Double>> edges = wordsPerTweetList.flatMap(new EdgeMapper()).groupBy(0, 1)
 				.sum(2);
 
-		graph = Graph.fromTupleDataSet(edges, new InitialNodeClassMapper(), env);
+		Graph<String, Long, Double> graph = Graph.fromTupleDataSet(edges, new InitialNodeClassMapper(), env);
 
 		// get the strongest connection between two nodes
 		double maxEdgeCount = graph.getEdges().max(2).collect().get(0).f2;
@@ -120,12 +97,11 @@ public class TwitterNewsGraphCreator {
 					}
 				});
 
-		verticleList = graph.getVertices().collect();
 		Graph<String, Long, Double> graphWithClusterId = graph
 				.run(new CommunityDetection<String>(AppConfig.maxIterations, AppConfig.delta));
-		DataSet<Vertex<String, Long>> vertexWithGroup = graphWithClusterId.getVertices();
+		DataSet<Vertex<String, Long>> vertexWithClusterId = graphWithClusterId.getVertices();
 
-		DataSet<Tuple2<Long, ArrayList<String>>> groupsWithWords = graphWithClusterId.getVertices().groupBy(1)
+		DataSet<Tuple2<Long, ArrayList<String>>> clusterIdWithWords = graphWithClusterId.getVertices().groupBy(1)
 				.reduceGroup(new GroupReduceFunction<Vertex<String, Long>, Tuple2<Long, ArrayList<String>>>() {
 					private static final long serialVersionUID = 1L;
 
@@ -133,20 +109,20 @@ public class TwitterNewsGraphCreator {
 					public void reduce(Iterable<Vertex<String, Long>> values,
 							Collector<Tuple2<Long, ArrayList<String>>> out) throws Exception {
 
-						Long group = null;
+						Long clusterId = null;
 						ArrayList<String> wordList = new ArrayList<>();
 						for (Tuple2<String, Long> t : values) {
-							group = t.f1;
+							clusterId = t.f1;
 							wordList.add(t.f0);
 						}
-						out.collect(new Tuple2<Long, ArrayList<String>>(group, wordList));
+						out.collect(new Tuple2<Long, ArrayList<String>>(clusterId, wordList));
 					}
 				});
-		// ID, Source, Gruppe
-		DataSet<Tuple3<Long, String, Long>> tweetsWithGroup = wordsPerTweet.join(vertexWithGroup).where(1).equalTo(0)
-				.with(new TweetGroupJoin());
+		// tweetId, source, clusterId
+		DataSet<Tuple3<Long, String, Long>> tweetIdWithSourceAndClusterId = wordsPerTweet.join(vertexWithClusterId)
+				.where(1).equalTo(0).with(new TweetGroupJoin());
 
-		DataSet<Tuple3<String, Long, Long>> sourceGroupSize = tweetsWithGroup.groupBy(2, 1)
+		DataSet<Tuple3<String, Long, Long>> sourceWithClusterIdAndSize = tweetIdWithSourceAndClusterId.groupBy(2, 1)
 				.reduceGroup(new GroupReduceFunction<Tuple3<Long, String, Long>, Tuple3<String, Long, Long>>() {
 					private static final long serialVersionUID = 1L;
 
@@ -154,20 +130,20 @@ public class TwitterNewsGraphCreator {
 					public void reduce(Iterable<Tuple3<Long, String, Long>> values,
 							Collector<Tuple3<String, Long, Long>> out) throws Exception {
 						HashSet<Long> hs = new HashSet<>();
-						Long group = 0l;
+						Long clusterId = null;
 						String source = "";
 						for (Tuple3<Long, String, Long> v : values) {
 							hs.add(v.f0);
 							source = v.f1;
-							group = v.f2;
+							clusterId = v.f2;
 
 						}
-						out.collect(new Tuple3<String, Long, Long>(source, group, (long) hs.size()));
+						out.collect(new Tuple3<String, Long, Long>(source, clusterId, (long) hs.size()));
 					}
 
 				});
-		DataSet<Tuple3<Long, ArrayList<String>, ArrayList<Tuple2<String, Long>>>> groupsWithWordsAndSources = groupsWithWords
-				.join(sourceGroupSize).where(0).equalTo(1).groupBy("f0.f0").reduceGroup(
+		DataSet<Tuple3<Long, ArrayList<String>, ArrayList<Tuple2<String, Long>>>> groupsWithWordsAndSources = clusterIdWithWords
+				.join(sourceWithClusterIdAndSize).where(0).equalTo(1).groupBy("f0.f0").reduceGroup(
 						new GroupReduceFunction<Tuple2<Tuple2<Long, ArrayList<String>>, Tuple3<String, Long, Long>>, Tuple3<Long, ArrayList<String>, ArrayList<Tuple2<String, Long>>>>() {
 							private static final long serialVersionUID = 1L;
 
@@ -203,7 +179,7 @@ public class TwitterNewsGraphCreator {
 							if (first) {
 								first = false;
 							} else {
-								s += ",";
+								s += ", ";
 							}
 							s += "\"" + word + "\"";
 						}
@@ -213,7 +189,7 @@ public class TwitterNewsGraphCreator {
 							if (first) {
 								first = false;
 							} else {
-								s += ",";
+								s += ", ";
 							}
 							s += "{\"name\": \"" + source.f0 + "\", \"count\": " + source.f1 + "}";
 						}
@@ -222,7 +198,6 @@ public class TwitterNewsGraphCreator {
 					}
 				});
 
-		// sourceGroupSize.print();
 		env.execute();
 	}
 

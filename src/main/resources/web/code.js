@@ -338,4 +338,64 @@ function applyFilter() {
 		alert("Es ist ein Fehler aufgetreten");
 		$.unblockUI();
 	});
+	
+
+	var fill = d3.scale.category20();
+	  var wordslist = [];
+	  var wordSize = 0;
+	  // word-cloud values
+	  var size = [700, 300];
+	  var fontSize = d3.scale.log().range([15, 100]);
+	  var fillColor = d3.scale.category20();
+
+	  $.getJSON("resources/cluster.txt", success = function( data ) {
+		   
+		  
+		  for (var i = 0; i < data.length; i++) {
+			  for (var j = 0; j < data[i].sources.length; j++)
+			  {
+				  
+				  wordSize = wordSize + data[i].sources[j].count;
+				  
+			  }
+			  wordslist.push({'text' : data[i].words[0], 'size' : wordSize / 200});
+			  wordSize = 0;
+		  }
+		  
+		  alert(wordslist[0].text + " " + wordslist[0].size);
+		});
+	  
+	  d3.layout.cloud()
+		.size(size)
+		.words(wordslist)
+		.font("Impact")
+		.fontSize(function(d) { return fontSize(+d.size); })
+		.on("end", draw)
+		.start();
+
+	  function draw(words) {
+			wordcloud = d3.select("body")
+				.append("svg")
+					.attr("width", size[0])
+					.attr("height", size[1])
+				.append("g")
+					.attr("transform", "translate(" + (size[0]/2) + "," + (size[1]/2) + ")");
+			
+			wordcloud.selectAll("text")
+					.data(words)
+				.enter().append("text")
+					.style("font-size", function(d) { return d.size + "px"; })
+					.style("fill", function(d) { return fill(d.text.toLowerCase()); })
+					.style("font-family", "Impact")
+					.attr("text-anchor", "middle")
+					.attr("transform", function(d) {
+					return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+					})
+					.text(function(d) { return d.text; });
+		}
+	  
+	
 }
+
+
+

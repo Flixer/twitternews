@@ -54,12 +54,20 @@
 <script src="d3.layout.cloud.js"></script>
 
 </head>
-<body>
-	<div id="cy"></div>
-	<span class="fa fa-bars config-toggle" id="config-toggle"></span>
+<body class="config-closed">
+	<ul id="header-tabs" class="nav nav-tabs">
+		<li role="presentation" class="active" data-container="cy"><a href="#">Graph</a></li>
+		<li role="presentation" data-container="tag-cloud"><a href="#">Tag-Cloud</a></li>
+		<li role="presentation" data-container="historical"><a href="#">Historische Entwicklung</a></li>
+	</ul>
+	<div class="tab-container" id="cy" style="display: block;"></div>
+	<div class="tab-container" id="tag-cloud"></div>
+	<div class="tab-container" id="historical"></div>
+	
+	<span class="fa fa-cog config-toggle" id="config-toggle"></span>
 	<div id="config" class="config">
 		<div class="preamble">
-			<span class="label label-info">Twitter News Analysis</span>
+			<span class="config-header">Twitter News Analysis</span>
 			<p>Themenanalyse von Nachrichtendiensten mittels Twitter.</p>
 		</div>
 

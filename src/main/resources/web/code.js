@@ -2,11 +2,93 @@ var cy;
 var graphData = [];
 var numberOfGraphResLoaded = 0;
 
+// word-cloud values
+var fill;
+var fontSize;
+var fillColor;
+var size = [ 400, 200 ];
+
+$(function() {
+	reloadInformation();
+	
+	// get the account list for the account specific filter
+	$.getJSON("resources/accounts.txt", success = function(data) {
+		var options = "";
+
+		for (var i = 0; i < data.length; i++) {
+			options += "<option value='" + data[i].name + "'>" + data[i].name
+					+ "</option>";
+		}
+
+		$("#twitterAccountList").append(options);
+	});
+
+	initMenu();
+	// create the datepicker
+	var pickerFrom = new Pikaday({
+		field : $('#datepickerFrom')[0],
+		format : 'YYYY-MM-DD',
+	});
+	var pickerTo = new Pikaday({
+		field : $('#datepickerTo')[0],
+		format : 'YYYY-MM-DD',
+	});
+
+	accountSpecificFilter();
+});
+
 function reloadInformation() {
+	fill = d3.scale.category20();
+	fontSize = d3.scale.log().range([ 15, 100 ]);
+	fillColor = d3.scale.category20();
+
 	numberOfGraphResLoaded = 0;
 	graphData = [];
 	$.get("resources/edges.txt", graphResDataParser, "text");
 	$.get("resources/nodes.txt", graphResDataParser, "text");
+	$.get("resources/cluster.txt", wordCloudParser, "text");
+}
+
+var wordCloudParser = function(data) {
+	var loadedData = jQuery.parseJSON("[" + data.substr(0, data.length - 3)
+			+ "]");
+
+	for (var i = 0; i < loadedData.length; i++) {
+		var wordslist = [];
+		var wordSize = 0;
+
+		for (var j = 0; j < loadedData[i].words.length; j++) {
+			wordslist.push({
+				'text' : loadedData[i].words[j],
+				'size' : .3
+			});
+		}
+		d3.layout.cloud().size(size).words(wordslist).font("Impact").fontSize(
+				function(d) {
+					return fontSize(+d.size);
+				}).on("end", drawTagCloud).start();
+	}
+
+};
+
+var drawTagCloud = function(words) {
+	wordcloud = d3.select("#tag-cloud").append("svg").attr("width", size[0]).attr(
+			"height", size[1]).append("g").attr("transform",
+			"translate(" + (size[0] / 2) + "," + (size[1] / 2) + ")");
+
+	wordcloud.selectAll("text").data(words).enter().append("text").style(
+			"font-size", function(d) {
+				return d.size + "px";
+			}).style("fill", function(d) {
+		return fill(d.text.toLowerCase());
+	}).style("font-family", "Impact").attr("text-anchor", "middle").attr(
+			"transform",
+			function(d) {
+				return "translate(" + [ d.x, d.y ] + ")rotate(" + d.rotate
+						+ ")";
+			}).text(function(d) {
+		return d.text;
+	});
 }
 
 var graphResDataParser = function(data) {
@@ -144,7 +226,7 @@ var initCY = (function() { // on dom ready
 	$('#config .param').remove();
 	var $config = $('#config');
 	var $btnParam = $('<div class="param"></div>');
-	
+
 	$config.append($btnParam);
 
 	var sliders = [ {
@@ -267,37 +349,6 @@ $(function() {
 	FastClick.attach(document.body);
 });
 
-reloadInformation();
-$(document).ready(
-		function() {
-			// get the account list for the account specific filter
-			$.getJSON("resources/accounts.txt", success = function(data) {
-				var options = "";
-
-				for (var i = 0; i < data.length; i++) {
-					options += "<option value='" + data[i].name + "'>"
-							+ data[i].name + "</option>";
-				}
-
-				$("#twitterAccountList").append(options);
-			});
-
-			// create the datepicker
-			var pickerFrom = new Pikaday({
-				field : $('#datepickerFrom')[0],
-				format : 'YYYY-MM-DD',
-			});
-			// console.log(pickerFrom);
-
-			var pickerTo = new Pikaday({
-				field : $('#datepickerTo')[0],
-				format : 'YYYY-MM-DD',
-			});
-			// console.log(pickerTo);
-
-			accountSpecificFilter();
-		});
-
 // the Twitter Account Dropdown is only enabled if the search should be account
 // specific
 function accountSpecificFilter() {
@@ -338,64 +389,16 @@ function applyFilter() {
 		alert("Es ist ein Fehler aufgetreten");
 		$.unblockUI();
 	});
-	
-
-	var fill = d3.scale.category20();
-	  var wordslist = [];
-	  var wordSize = 0;
-	  // word-cloud values
-	  var size = [700, 300];
-	  var fontSize = d3.scale.log().range([15, 100]);
-	  var fillColor = d3.scale.category20();
-
-	  $.getJSON("resources/cluster.txt", success = function( data ) {
-		   
-		  
-		  for (var i = 0; i < data.length; i++) {
-			  for (var j = 0; j < data[i].sources.length; j++)
-			  {
-				  
-				  wordSize = wordSize + data[i].sources[j].count;
-				  
-			  }
-			  wordslist.push({'text' : data[i].words[0], 'size' : wordSize / 200});
-			  wordSize = 0;
-		  }
-		  
-		  alert(wordslist[0].text + " " + wordslist[0].size);
-		});
-	  
-	  d3.layout.cloud()
-		.size(size)
-		.words(wordslist)
-		.font("Impact")
-		.fontSize(function(d) { return fontSize(+d.size); })
-		.on("end", draw)
-		.start();
-
-	  function draw(words) {
-			wordcloud = d3.select("body")
-				.append("svg")
-					.attr("width", size[0])
-					.attr("height", size[1])
-				.append("g")
-					.attr("transform", "translate(" + (size[0]/2) + "," + (size[1]/2) + ")");
-			
-			wordcloud.selectAll("text")
-					.data(words)
-				.enter().append("text")
-					.style("font-size", function(d) { return d.size + "px"; })
-					.style("fill", function(d) { return fill(d.text.toLowerCase()); })
-					.style("font-family", "Impact")
-					.attr("text-anchor", "middle")
-					.attr("transform", function(d) {
-					return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
-					})
-					.text(function(d) { return d.text; });
-		}
-	  
-	
 }
+initMenu = function() {
+	$("#header-tabs a").click(function() {
+		var li = $(this).parent();
+		$("#header-tabs li").removeClass('active');
+		li.addClass('active');
 
-
+		$(".tab-container").hide();
+		$(".tab-container#" + li.data('container')).show();
+		return false;
+	});
+}
 

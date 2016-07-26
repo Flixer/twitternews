@@ -1,6 +1,7 @@
 var cy;
 var graphData = [];
 var numberOfGraphResLoaded = 0;
+var wordCloudData;
 
 // word-cloud values
 var fill;
@@ -10,7 +11,7 @@ var size = [ 400, 200 ];
 
 $(function() {
 	reloadInformation();
-	
+
 	// get the account list for the account specific filter
 	$.getJSON("resources/accounts.txt", success = function(data) {
 		var options = "";
@@ -50,16 +51,19 @@ function reloadInformation() {
 }
 
 var wordCloudParser = function(data) {
-	var loadedData = jQuery.parseJSON("[" + data.substr(0, data.length - 3)
+	// draw new tag cloud -> delete old clouds
+	$("#tag-cloud").html("");
+
+	wordCloudData = jQuery.parseJSON("[" + data.substr(0, data.length - 3)
 			+ "]");
 
-	for (var i = 0; i < loadedData.length; i++) {
+	for (var i = 0; i < wordCloudData.length; i++) {
 		var wordslist = [];
 		var wordSize = 0;
 
-		for (var j = 0; j < loadedData[i].words.length; j++) {
+		for (var j = 0; j < wordCloudData[i].words.length; j++) {
 			wordslist.push({
-				'text' : loadedData[i].words[j],
+				'text' : wordCloudData[i].words[j],
 				'size' : .3
 			});
 		}
@@ -69,10 +73,36 @@ var wordCloudParser = function(data) {
 				}).on("end", drawTagCloud).start();
 	}
 
+	$(".word-cloud-wrapper").click(function() {
+		var elm = $(this);
+		if (!elm.hasClass("cloud-expanded")) {
+			$(".word-cloud-wrapper").removeClass(
+					"cloud-expanded");
+			elm.addClass("cloud-expanded");
+			
+			if (!elm.hasClass("has-additional-info")) {
+				elm.addClass("has-additional-info");
+				var cloudSourceHtml = "TODO - Make as chart: <br/><br/>";
+				for (var j = 0; j < wordCloudData[elm.index()].sources.length; j++) {
+					var source = wordCloudData[elm.index()].sources[j];
+					cloudSourceHtml += "<b>" + source.name + ":</b> " + source.count + "<br/>"
+				}
+				elm.prepend("<div class=\"cloud-sources\">" + cloudSourceHtml + "</div>");
+				elm.prepend("<div class=\"cloud-header\"><span class=\"fa fa-times config-toggle close-word-cloud\"></span></div>");
+				$(".close-word-cloud").click(
+						function() {
+							$(".word-cloud-wrapper").removeClass(
+									"cloud-expanded");
+							return false;
+						});
+			}
+		}
+	});
 };
 
 var drawTagCloud = function(words) {
-	wordcloud = d3.select("#tag-cloud").append("svg").attr("width", size[0]).attr(
+	wordcloud = d3.select("#tag-cloud").append("div").attr("class",
+			"word-cloud-wrapper").append("svg").attr("width", size[0]).attr(
 			"height", size[1]).append("g").attr("transform",
 			"translate(" + (size[0] / 2) + "," + (size[1] / 2) + ")");
 
@@ -401,4 +431,3 @@ initMenu = function() {
 		return false;
 	});
 }
-

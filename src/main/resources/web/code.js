@@ -2,6 +2,7 @@ var cy;
 var graphData = [];
 var numberOfGraphResLoaded = 0;
 var wordCloudData;
+var wordFrequencyList;
 
 // word-cloud values
 var fill;
@@ -47,7 +48,6 @@ function reloadInformation() {
 	graphData = [];
 	$.get("resources/edges.txt", graphResDataParser, "text");
 	$.get("resources/nodes.txt", graphResDataParser, "text");
-	$.get("resources/cluster.txt", wordCloudParser, "text");
 }
 
 var wordCloudParser = function(data) {
@@ -62,9 +62,13 @@ var wordCloudParser = function(data) {
 		var wordSize = 0;
 
 		for (var j = 0; j < wordCloudData[i].words.length; j++) {
+			var sizeMultiplier = wordFrequencyList[wordCloudData[i].words[j]];
+			if (!sizeMultiplier) {
+				sizeMultiplier = 0.1;
+			}
 			wordslist.push({
 				'text' : wordCloudData[i].words[j],
-				'size' : .3
+				'size' : 5 * Math.pow(sizeMultiplier, 0.5)
 			});
 		}
 		d3.layout.cloud().size(size).words(wordslist).font("Impact").fontSize(
@@ -115,13 +119,14 @@ var drawTagCloud = function(words) {
 
 	wordcloud.selectAll("text").data(words).enter().append("text").style(
 			"font-size", function(d) {
+				console.log(d.size);
 				return d.size + "px";
 			}).style("fill", function(d) {
 		return fill(d.text.toLowerCase());
 	}).style("font-family", "Impact").attr("text-anchor", "middle").attr(
 			"transform",
 			function(d) {
-				return "translate(" + [ d.x, d.y ] + ")rotate(" + d.rotate
+				return "translate(" + [ d.x, d.y ] + ") rotate(" + d.rotate
 						+ ")";
 			}).text(function(d) {
 		return d.text;
@@ -131,6 +136,16 @@ var drawTagCloud = function(words) {
 var graphResDataParser = function(data) {
 	var loadedData = jQuery.parseJSON("[" + data.substr(0, data.length - 2)
 			+ "]");
+	if (loadedData.length && loadedData[0].group == "nodes") {
+		// wait for loading cluster information until node information are loaded
+		$.get("resources/cluster.txt", wordCloudParser, "text");
+		
+		wordFrequencyList = {};
+		for (var n in loadedData) {
+			var nodeData = loadedData[n].data;
+			wordFrequencyList[nodeData.name] = nodeData.score;
+		}
+	}
 	graphData = $.merge(graphData, loadedData);
 	numberOfGraphResLoaded++;
 	if (numberOfGraphResLoaded == 2) {

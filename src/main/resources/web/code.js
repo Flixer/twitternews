@@ -47,8 +47,8 @@ function reloadInformation() {
 
 	numberOfGraphResLoaded = 0;
 	graphData = [];
-	$.get("resources/edges.txt", graphResDataParser, "text");
-	$.get("resources/nodes.txt", graphResDataParser, "text");
+	$.get("resources/edges.txt", graphResDataParser, "json");
+	$.get("resources/nodes.txt", graphResDataParser, "json");
 	createHistoricalChart();
 }
 
@@ -56,8 +56,7 @@ var wordCloudParser = function(data) {
 	// draw new tag cloud -> delete old clouds
 	$("#tag-cloud").html("");
 
-	wordCloudData = jQuery.parseJSON("[" + data.substr(0, data.length - 3)
-			+ "]");
+	wordCloudData = data;
 
 	for (var i = 0; i < wordCloudData.length; i++) {
 		var wordslist = [];
@@ -134,12 +133,10 @@ var drawTagCloud = function(words) {
 	});
 }
 
-var graphResDataParser = function(data) {
-	var loadedData = jQuery.parseJSON("[" + data.substr(0, data.length - 2)
-			+ "]");
+var graphResDataParser = function(loadedData) {
 	if (loadedData.length && loadedData[0].group == "nodes") {
 		// wait for loading cluster information until node information are loaded
-		$.get("resources/cluster.txt", wordCloudParser, "text");
+		$.get("resources/cluster.txt", wordCloudParser, "json");
 		
 		wordFrequencyList = {};
 		for (var n in loadedData) {

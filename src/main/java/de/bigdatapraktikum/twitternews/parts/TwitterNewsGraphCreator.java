@@ -5,10 +5,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.api.java.operators.DataSource;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.graph.Graph;
@@ -19,11 +23,15 @@ import de.bigdatapraktikum.twitternews.config.AppConfig;
 import de.bigdatapraktikum.twitternews.output.OutputCluster;
 import de.bigdatapraktikum.twitternews.output.OutputEdges;
 import de.bigdatapraktikum.twitternews.output.OutputHistorical;
+import de.bigdatapraktikum.twitternews.output.OutputNodes;
 import de.bigdatapraktikum.twitternews.processing.ChineseWhisper;
 import de.bigdatapraktikum.twitternews.processing.EdgeMapper;
+import de.bigdatapraktikum.twitternews.processing.IdfValueCalculator;
 import de.bigdatapraktikum.twitternews.processing.InitialNodeClassMapper;
 import de.bigdatapraktikum.twitternews.processing.TweetFilter;
 import de.bigdatapraktikum.twitternews.processing.TweetGroupJoin;
+import de.bigdatapraktikum.twitternews.processing.UniqueWordMapper;
+import de.bigdatapraktikum.twitternews.processing.UniqueWordsIdfJoin;
 import de.bigdatapraktikum.twitternews.source.Tweet;
 
 // this class creates a co-occurrence graph
@@ -34,10 +42,60 @@ public class TwitterNewsGraphCreator {
 		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 		env.setParallelism(AppConfig.PARALLELISM);
 
-		// get the filtered tweets
-		TwitterNewsTopicAnalysis twitterNewsTopicAnalysis = new TwitterNewsTopicAnalysis();
-		DataSet<Tuple2<Tweet, String>> wordsPerTweet = twitterNewsTopicAnalysis.getFilteredWordsInTweets(env,
-				tweetFilter);
+		// get input data from previously stored twitter data
+		DataSource<String> tweetStrings = env.readTextFile(AppConfig.RESOURCES_TWEETS, "UTF-8");
+		DataSet<Tweet> tweets = tweetStrings.flatMap(new FlatMapFunction<String, Tweet>() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void flatMap(String value, Collector<Tweet> out) throws Exception {
+				Tweet tweet = Tweet.fromString(value);
+				// currently this filter can filter time range
+				// later this filter function could be upgraded with different
+				// filter-properties
+				if (tweetFilter.isValidTweet(tweet)) {
+					out.collect(tweet);
+				}
+			}
+		});
+		// Calculates the number of tweets
+		double amountOfTweets = tweets.count();
+
+		// Calculates occurrence for all the unique words. Excludes the
+		// irrelevant words that are defined in the AppConfig.java
+		DataSet<Tuple3<Tweet, String, Integer>> uniqueWordsinTweets = tweets
+				.flatMap(new UniqueWordMapper(AppConfig.IRRELEVANT_WORDS));
+
+		// group all unique words in tweets and get their respective number of
+		// occurences
+		DataSet<Tuple2<String, Integer>> tweetFrequency = uniqueWordsinTweets
+				.map(new MapFunction<Tuple3<Tweet, String, Integer>, Tuple2<String, Integer>>() {
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public Tuple2<String, Integer> map(Tuple3<Tweet, String, Integer> input) throws Exception {
+						String uniqueWord = input.f1;
+						Integer count = input.f2;
+						return new Tuple2<>(uniqueWord, count);
+					}
+				}).groupBy(0).sum(1).setParallelism(1);
+
+		// Calculates the IDF Values for all the words
+		DataSet<Tuple2<String, Double>> idfValues = tweetFrequency.map(new IdfValueCalculator(amountOfTweets));
+
+		// get the first n entries with the highest idf value
+		DataSet<Tuple2<String, Double>> filteredIdfValues = idfValues.sortPartition(1, Order.ASCENDING)
+				.first(AppConfig.NUMBER_OF_NODES);
+
+		// Join unique words in tweets with filteredIdfValue words, so that the
+		// resulting data is a dataset with tuple2 objects (which contain a
+		// tweet and a topic word within that tweet). We group that data by
+		// tweet and aggregate all topic words in an ArrayList. The final result
+		// is a dataset with tweets and a list of all topic words within that
+		// tweet
+		DataSet<Tuple2<Tweet, String>> wordsPerTweet = uniqueWordsinTweets.join(filteredIdfValues).where(1).equalTo(0)
+				.with(new UniqueWordsIdfJoin());
+		// wordsPerTweet.print();
 
 		DataSet<Tuple2<Tweet, ArrayList<String>>> wordsPerTweetList = wordsPerTweet
 				.groupBy(new KeySelector<Tuple2<Tweet, String>, Long>() {
@@ -98,7 +156,6 @@ public class TwitterNewsGraphCreator {
 								out.collect(new Tuple2<String, HashMap<String, Integer>>(date, sources));
 							}
 						});
-		OutputHistorical.set(dateWithSourcesDistribution);
 
 		// create the graph
 		DataSet<Tuple3<String, String, Double>> edges = wordsPerTweetList.flatMap(new EdgeMapper()).groupBy(0, 1)
@@ -182,10 +239,12 @@ public class TwitterNewsGraphCreator {
 
 						});
 
+		OutputHistorical.set(dateWithSourcesDistribution);
+		OutputNodes.set(filteredIdfValues, "");
 		OutputEdges.set(graph.getEdges());
 		OutputCluster.set(groupsWithWordsAndSources);
 
-		env.execute();
+		// env.execute();
 	}
 
 }

@@ -6,13 +6,29 @@ import java.time.format.DateTimeFormatter;
 
 import de.bigdatapraktikum.twitternews.source.Tweet;
 
-public class TweetFilter implements Serializable {
+public class Settings implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private LocalDateTime dateFrom = null;
 	private LocalDateTime dateTo = null;
 	private String source = null;
 	private String tweetContent = null;
+
+	private int clusterIterationCount = 5;
+	private String clusterAlgorithm = ClusterAlgorithms.COMMUNITY_DETECTION.getValue();
+
+	public enum ClusterAlgorithms {
+		CHINESE_WHISPER("chinese_whisper"), COMMUNITY_DETECTION("community_detection");
+		private final String value;
+
+		private ClusterAlgorithms(String value) {
+			this.value = value;
+		}
+
+		public String getValue() {
+			return value;
+		}
+	};
 
 	public boolean isValidTweet(Tweet tweet) {
 		if (dateFrom != null && tweet.getPublishedAt().isBefore(dateFrom)) {
@@ -61,5 +77,21 @@ public class TweetFilter implements Serializable {
 
 	public void setTweetContent(String tweetContent) {
 		this.tweetContent = tweetContent;
+	}
+
+	public int getClusterIterationCount() {
+		return clusterIterationCount;
+	}
+
+	public void setClusterIterationCount(int clusterIterationCount) {
+		this.clusterIterationCount = clusterIterationCount;
+	}
+
+	public String getClusterAlgorithm() {
+		return clusterAlgorithm;
+	}
+
+	public void setClusterAlgorithm(String clusterAlgorithm) {
+		this.clusterAlgorithm = clusterAlgorithm;
 	}
 }

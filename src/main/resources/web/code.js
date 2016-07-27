@@ -69,7 +69,7 @@ var wordCloudParser = function(data) {
 			}
 			wordslist.push({
 				'text' : wordCloudData[i].words[j],
-				'size' : 5 * Math.pow(sizeMultiplier, 0.5)
+				'size' : 2.5 * Math.pow(sizeMultiplier, 0.3)
 			});
 		}
 		d3.layout.cloud().size(size).words(wordslist).font("Impact").fontSize(
@@ -525,7 +525,10 @@ function applyFilter() {
 	var dateFrom = $("#datepickerFrom").val();
 	var dateTo = $("#datepickerTo").val();
 	var tweetContent = $("#tweetContent").val();
+	var clusterAlgorithm = $("#clusterAlgorithm").val();
+	var clusterIterationCount = $("#clusterIterationCount").val();
 
+	
 	var url = "/analyze?";
 	if ($("#accountSpecificFilterDropdown").val() === "1") {
 		url += "source=" + $("#twitterAccountList").val() + "&";
@@ -539,7 +542,13 @@ function applyFilter() {
 	if (tweetContent) {
 		url += "tweetContent=" + tweetContent + "&";
 	}
-
+	if (clusterAlgorithm) {
+		url += "clusterAlgorithm=" + clusterAlgorithm + "&";
+	}
+	if (clusterIterationCount) {
+		url += "clusterIterationCount=" + clusterIterationCount + "&";
+	}
+	
 	var loadingText = '<div class="cssload-loader"><div class="cssload-inner cssload-one"></div><div class="cssload-inner cssload-two"></div><div class="cssload-inner cssload-three"></div></div><h1>Twitter Daten werden analyisiert...</h1>';
 	$.blockUI({
 		message : loadingText

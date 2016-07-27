@@ -100,6 +100,28 @@
 				Thematische Einschränkung: <br> <input type="text"
 					class="filter-input-text" id="tweetContent">
 			</div>
+			<div class="dropdown">
+				Cluster-Algorithmus: <br> <select
+					class="dropdown-content" id="clusterAlgorithm">
+					<option value="community_detection" selected>Community Detection</option>
+					<option value="chinese_whisper">Chinese Whisper</option>
+				</select>
+			</div>
+			<div class="dropdown">
+				Iterationen Cluster-Algorithmus: <br> <select
+					class="dropdown-content" id="clusterIterationCount">
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+					<option value="5" selected>5</option>
+					<option value="6">6</option>
+					<option value="7">7</option>
+					<option value="8">8</option>
+					<option value="9">9</option>
+					<option value="10">10</option>
+				</select>
+			</div>
 			<div class="apply-filter-button">
 				<button type="button" onclick="applyFilter()">Apply filter</button>
 			</div>

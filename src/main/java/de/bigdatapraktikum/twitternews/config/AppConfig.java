@@ -8,7 +8,6 @@ public class AppConfig {
 
 	public static final int NUMBER_OF_NODES = 50;
 
-	public static final int maxIterations = 3;
 	public static final double delta = 0.5;
 
 	public static final String RESOURCES_TWEETS = "src/main/resources/web/resources/tweets.txt";

@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import de.bigdatapraktikum.twitternews.source.Tweet;
 
-public class TweetFilterTest {
+public class SettingsTest {
 
 	@Test
 	public void testFilterByDateRange() throws Exception {
@@ -18,7 +18,7 @@ public class TweetFilterTest {
 		Tweet tweet3 = new Tweet(3, LocalDateTime.of(2016, 4, 20, 0, 0), "SOURCE", "C", 1);
 		Tweet tweet4 = new Tweet(4, LocalDateTime.of(2014, 5, 20, 0, 0), "SOURCE", "A C D", 1);
 
-		TweetFilter filter = new TweetFilter();
+		Settings filter = new Settings();
 		filter.setDateFrom("2016-04-20 00:00:00");
 		assertTrue(filter.isValidTweet(tweet1));
 		assertTrue(filter.isValidTweet(tweet2));

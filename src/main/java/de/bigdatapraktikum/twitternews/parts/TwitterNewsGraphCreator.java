@@ -17,6 +17,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
+import org.apache.flink.graph.library.CommunityDetection;
 import org.apache.flink.util.Collector;
 
 import de.bigdatapraktikum.twitternews.config.AppConfig;
@@ -28,7 +29,8 @@ import de.bigdatapraktikum.twitternews.processing.ChineseWhisper;
 import de.bigdatapraktikum.twitternews.processing.EdgeMapper;
 import de.bigdatapraktikum.twitternews.processing.IdfValueCalculator;
 import de.bigdatapraktikum.twitternews.processing.InitialNodeClassMapper;
-import de.bigdatapraktikum.twitternews.processing.TweetFilter;
+import de.bigdatapraktikum.twitternews.processing.Settings;
+import de.bigdatapraktikum.twitternews.processing.Settings.ClusterAlgorithms;
 import de.bigdatapraktikum.twitternews.processing.TweetGroupJoin;
 import de.bigdatapraktikum.twitternews.processing.UniqueWordMapper;
 import de.bigdatapraktikum.twitternews.processing.UniqueWordsIdfJoin;
@@ -36,7 +38,7 @@ import de.bigdatapraktikum.twitternews.source.Tweet;
 
 // this class creates a co-occurrence graph
 public class TwitterNewsGraphCreator {
-	public void execute(TweetFilter tweetFilter) throws Exception {
+	public void execute(Settings settings) throws Exception {
 		// TODO: add more comments to explain what is happening in this class
 
 		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -53,7 +55,7 @@ public class TwitterNewsGraphCreator {
 				// currently this filter can filter time range
 				// later this filter function could be upgraded with different
 				// filter-properties
-				if (tweetFilter.isValidTweet(tweet)) {
+				if (settings.isValidTweet(tweet)) {
 					out.collect(tweet);
 				}
 			}
@@ -163,10 +165,13 @@ public class TwitterNewsGraphCreator {
 
 		Graph<String, Long, Double> graph = Graph.fromTupleDataSet(edges, new InitialNodeClassMapper(), env);
 
-		// Graph<String, Long, Double> graphWithClusterId = graph
-		// .run(new CommunityDetection<String>(AppConfig.maxIterations,
-		// AppConfig.delta));
-		Graph<String, Long, Double> graphWithClusterId = graph.run(new ChineseWhisper<String>(AppConfig.maxIterations));
+		Graph<String, Long, Double> graphWithClusterId = null;
+		if (settings.getClusterAlgorithm().equals(ClusterAlgorithms.CHINESE_WHISPER.getValue())) {
+			graphWithClusterId = graph.run(new ChineseWhisper<String>(settings.getClusterIterationCount()));
+		} else {
+			graphWithClusterId = graph
+					.run(new CommunityDetection<String>(settings.getClusterIterationCount(), AppConfig.delta));
+		}
 
 		DataSet<Vertex<String, Long>> vertexWithClusterId = graphWithClusterId.getVertices();
 

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import de.bigdatapraktikum.twitternews.config.AppConfig;
 import de.bigdatapraktikum.twitternews.parts.TwitterNewsCollector;
 import de.bigdatapraktikum.twitternews.parts.TwitterNewsGraphCreator;
-import de.bigdatapraktikum.twitternews.processing.TweetFilter;
+import de.bigdatapraktikum.twitternews.processing.Settings;
 
 @RestController
 public class MainController {
@@ -34,7 +34,7 @@ public class MainController {
 	}
 
 	@RequestMapping(value = "/analyze", method = RequestMethod.GET)
-	protected int analyze(@ModelAttribute TweetFilter filter) {
+	protected int analyze(@ModelAttribute Settings filter) {
 		TwitterNewsGraphCreator analyzer = new TwitterNewsGraphCreator();
 		try {
 			analyzer.execute(filter);

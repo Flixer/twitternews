@@ -79,6 +79,10 @@ var wordCloudParser = function(data) {
 			$(".word-cloud-wrapper").removeClass(
 					"cloud-expanded");
 			elm.addClass("cloud-expanded");
+			var svg = $(".cloud-expanded").find("svg");
+			svg.width(svg.width() * 2.5);
+			svg.height(svg.height() * 2.5);
+			svg.find("g").attr("transform", "translate(500,250) scale(2.5)");
 			
 			if (!elm.hasClass("has-additional-info")) {
 				elm.addClass("has-additional-info");
@@ -93,6 +97,9 @@ var wordCloudParser = function(data) {
 						function() {
 							$(".word-cloud-wrapper").removeClass(
 									"cloud-expanded");
+							svg.width(svg.width() / 2.5);
+							svg.height(svg.height() / 2.5);
+							svg.find("g").attr("transform", "translate(200,100) scale(1)");
 							return false;
 						});
 			}
@@ -367,7 +374,7 @@ var initCY = (function() { // on dom ready
 		});
 	});
 
-	$('#config-toggle').on('click', function() {
+	$('#config-toggle').unbind("click").on('click', function() {
 		$('body').toggleClass('config-closed');
 
 		cy.resize();

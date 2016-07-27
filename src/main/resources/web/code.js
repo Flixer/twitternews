@@ -527,6 +527,7 @@ function accountSpecificFilter() {
 function applyFilter() {
 	var dateFrom = $("#datepickerFrom").val();
 	var dateTo = $("#datepickerTo").val();
+	var tweetContent = $("#tweetContent").val();
 
 	var url = "/analyze?";
 	if ($("#accountSpecificFilterDropdown").val() === "1") {
@@ -537,6 +538,9 @@ function applyFilter() {
 	}
 	if (dateTo) {
 		url += "dateTo=" + dateTo + " 23:59:59&";
+	}
+	if (tweetContent) {
+		url += "tweetContent=" + tweetContent + "&";
 	}
 
 	var loadingText = '<div class="cssload-loader"><div class="cssload-inner cssload-one"></div><div class="cssload-inner cssload-two"></div><div class="cssload-inner cssload-three"></div></div><h1>Twitter Daten werden analyisiert...</h1>';

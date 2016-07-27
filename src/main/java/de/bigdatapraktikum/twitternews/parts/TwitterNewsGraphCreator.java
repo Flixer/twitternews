@@ -13,13 +13,13 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
-import org.apache.flink.graph.library.CommunityDetection;
 import org.apache.flink.util.Collector;
 
 import de.bigdatapraktikum.twitternews.config.AppConfig;
 import de.bigdatapraktikum.twitternews.output.OutputCluster;
 import de.bigdatapraktikum.twitternews.output.OutputEdges;
 import de.bigdatapraktikum.twitternews.output.OutputHistorical;
+import de.bigdatapraktikum.twitternews.processing.ChineseWhisper;
 import de.bigdatapraktikum.twitternews.processing.EdgeMapper;
 import de.bigdatapraktikum.twitternews.processing.InitialNodeClassMapper;
 import de.bigdatapraktikum.twitternews.processing.TweetFilter;
@@ -106,8 +106,11 @@ public class TwitterNewsGraphCreator {
 
 		Graph<String, Long, Double> graph = Graph.fromTupleDataSet(edges, new InitialNodeClassMapper(), env);
 
-		Graph<String, Long, Double> graphWithClusterId = graph
-				.run(new CommunityDetection<String>(AppConfig.maxIterations, AppConfig.delta));
+		// Graph<String, Long, Double> graphWithClusterId = graph
+		// .run(new CommunityDetection<String>(AppConfig.maxIterations,
+		// AppConfig.delta));
+		Graph<String, Long, Double> graphWithClusterId = graph.run(new ChineseWhisper<String>(AppConfig.maxIterations));
+
 		DataSet<Vertex<String, Long>> vertexWithClusterId = graphWithClusterId.getVertices();
 
 		DataSet<Tuple2<Long, ArrayList<String>>> clusterIdWithWords = graphWithClusterId.getVertices().groupBy(1)
@@ -163,7 +166,7 @@ public class TwitterNewsGraphCreator {
 							public void reduce(
 									Iterable<Tuple2<Tuple2<Long, ArrayList<String>>, Tuple3<String, Long, Long>>> values,
 									Collector<Tuple3<Long, ArrayList<String>, ArrayList<Tuple2<String, Long>>>> out)
-									throws Exception {
+											throws Exception {
 								Long groupId = null;
 								ArrayList<String> wordList = new ArrayList<>();
 								ArrayList<Tuple2<String, Long>> sourcesList = new ArrayList<>();

@@ -90,8 +90,8 @@ public class TwitterNewsTopicAnalysis {
 		// });
 
 		// get the first n entries with the highest idf value
-		DataSet<Tuple2<String, Double>> filteredIdfValues = idfValues.sortPartition(1, Order.ASCENDING)
-				.first(AppConfig.NUMBER_OF_NODES);
+		DataSet<Tuple2<String, Double>> filteredIdfValues = idfValues.partitionByRange(1)
+				.sortPartition(1, Order.ASCENDING).first(AppConfig.NUMBER_OF_NODES);
 
 		OutputNodes.set(filteredIdfValues);
 

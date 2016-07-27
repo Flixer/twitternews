@@ -20,7 +20,7 @@ public class OutputNodes {
 						return "{\"data\":{\"id\":\"" + value.f0 + "\",\"name\":\"" + value.f0 + "\",\"score\":"
 								+ (1 - value.f1 / maxIdfValue) + "},\"group\":\"nodes\"},";
 					}
-				});
+				}).setParallelism(1);
 	}
 
 }

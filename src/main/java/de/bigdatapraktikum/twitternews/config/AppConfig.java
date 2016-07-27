@@ -4,8 +4,8 @@ public class AppConfig {
 	public static final int STATUS_OK = 200;
 	public static final int STATUS_INTERNAL_ERROR = 500;
 
-	// deprecated
-	public static final double MAX_IDF_VALUE = 2.0;
+	public static final int PARALLELISM = 4;
+
 	public static final int NUMBER_OF_NODES = 50;
 
 	public static final int maxIterations = 3;

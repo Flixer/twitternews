@@ -27,7 +27,7 @@ public class OutputEdges {
 								+ weight + "},\"group\":\"edges\",\"style\":{\"line-color\":\"rgb(" + colorIntensityR
 								+ ", " + colorIntensityG + "," + colorIntensityB + ")\"}},";
 					}
-				});
+				}).setParallelism(1);
 	}
 
 }

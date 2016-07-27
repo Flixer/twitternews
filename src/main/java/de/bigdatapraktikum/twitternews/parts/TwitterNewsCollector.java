@@ -25,6 +25,7 @@ public class TwitterNewsCollector {
 
 		// set up the execution environment
 		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+		env.setParallelism(AppConfig.PARALLELISM);
 
 		// get input data (tweet Status objects) from specific twitter accounts
 		DataStreamSource<Status> tweetStatuses = env

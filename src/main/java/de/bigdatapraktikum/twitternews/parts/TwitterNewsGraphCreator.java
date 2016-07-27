@@ -32,7 +32,7 @@ public class TwitterNewsGraphCreator {
 		// TODO: add more comments to explain what is happening in this class
 
 		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-		env.setParallelism(1);
+		env.setParallelism(AppConfig.PARALLELISM);
 
 		// get the filtered tweets
 		TwitterNewsTopicAnalysis twitterNewsTopicAnalysis = new TwitterNewsTopicAnalysis();
@@ -166,7 +166,7 @@ public class TwitterNewsGraphCreator {
 							public void reduce(
 									Iterable<Tuple2<Tuple2<Long, ArrayList<String>>, Tuple3<String, Long, Long>>> values,
 									Collector<Tuple3<Long, ArrayList<String>, ArrayList<Tuple2<String, Long>>>> out)
-											throws Exception {
+									throws Exception {
 								Long groupId = null;
 								ArrayList<String> wordList = new ArrayList<>();
 								ArrayList<Tuple2<String, Long>> sourcesList = new ArrayList<>();

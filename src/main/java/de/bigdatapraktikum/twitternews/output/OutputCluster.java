@@ -43,7 +43,7 @@ public class OutputCluster {
 						s += "]}, ";
 						return s;
 					}
-				});
+				}).setParallelism(1);
 	}
 
 }

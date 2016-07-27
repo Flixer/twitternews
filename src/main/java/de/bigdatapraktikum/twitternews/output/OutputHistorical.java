@@ -35,7 +35,7 @@ public class OutputHistorical {
 						}
 						return s;
 					}
-				});
+				}).setParallelism(1);
 	}
 
 }

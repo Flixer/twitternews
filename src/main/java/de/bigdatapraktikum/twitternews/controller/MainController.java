@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import de.bigdatapraktikum.twitternews.config.AppConfig;
 import de.bigdatapraktikum.twitternews.parts.TwitterNewsCollector;
 import de.bigdatapraktikum.twitternews.parts.TwitterNewsGraphCreator;
 import de.bigdatapraktikum.twitternews.processing.TweetFilter;
-import de.bigdatapraktikum.twitternews.utils.AppConfig;
 
 @RestController
 public class MainController {

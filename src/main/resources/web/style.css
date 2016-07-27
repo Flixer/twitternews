@@ -199,6 +199,22 @@ h1 {
 	display: block;
 }
 
+.bar {
+  fill: steelblue;
+}
+
+.axis path {
+  display: none;
+}
+.dateInfo {
+    background-color: white;
+    border: 1px solid #555;
+    border-radius: 3px;
+    padding: 5px;
+    position: absolute;
+}
+
+
 /* Loader CSS */
 
 .cssload-loader {

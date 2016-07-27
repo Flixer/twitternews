@@ -1,28 +1,30 @@
 package de.bigdatapraktikum.twitternews.parts;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.io.TextOutputFormat.TextFormatter;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.core.fs.FileSystem.WriteMode;
-import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.library.CommunityDetection;
 import org.apache.flink.util.Collector;
 
+import de.bigdatapraktikum.twitternews.config.AppConfig;
+import de.bigdatapraktikum.twitternews.output.OutputCluster;
+import de.bigdatapraktikum.twitternews.output.OutputEdges;
+import de.bigdatapraktikum.twitternews.output.OutputHistorical;
 import de.bigdatapraktikum.twitternews.processing.EdgeMapper;
 import de.bigdatapraktikum.twitternews.processing.InitialNodeClassMapper;
 import de.bigdatapraktikum.twitternews.processing.TweetFilter;
 import de.bigdatapraktikum.twitternews.processing.TweetGroupJoin;
 import de.bigdatapraktikum.twitternews.source.Tweet;
-import de.bigdatapraktikum.twitternews.utils.AppConfig;
 
 // this class creates a co-occurrence graph
 public class TwitterNewsGraphCreator {
@@ -72,30 +74,37 @@ public class TwitterNewsGraphCreator {
 					}
 				});
 
+		DataSet<Tuple2<String, HashMap<String, Integer>>> dateWithSourcesDistribution = wordsPerTweetList
+				.groupBy(new KeySelector<Tuple2<Tweet, ArrayList<String>>, String>() {
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public String getKey(Tuple2<Tweet, ArrayList<String>> value) throws Exception {
+						return value.f0.getPublishedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+					}
+				}).reduceGroup(
+						new GroupReduceFunction<Tuple2<Tweet, ArrayList<String>>, Tuple2<String, HashMap<String, Integer>>>() {
+							private static final long serialVersionUID = 1L;
+
+							@Override
+							public void reduce(Iterable<Tuple2<Tweet, ArrayList<String>>> values,
+									Collector<Tuple2<String, HashMap<String, Integer>>> out) throws Exception {
+								String date = null;
+								HashMap<String, Integer> sources = new HashMap<>();
+								for (Tuple2<Tweet, ArrayList<String>> v : values) {
+									date = v.f0.getPublishedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+									sources.put(v.f0.getSource(), sources.getOrDefault(v.f0.getSource(), 0) + 1);
+								}
+								out.collect(new Tuple2<String, HashMap<String, Integer>>(date, sources));
+							}
+						});
+		OutputHistorical.set(dateWithSourcesDistribution);
+
 		// create the graph
 		DataSet<Tuple3<String, String, Double>> edges = wordsPerTweetList.flatMap(new EdgeMapper()).groupBy(0, 1)
 				.sum(2);
 
 		Graph<String, Long, Double> graph = Graph.fromTupleDataSet(edges, new InitialNodeClassMapper(), env);
-
-		// get the strongest connection between two nodes
-		double maxEdgeCount = graph.getEdges().max(2).collect().get(0).f2;
-
-		graph.getEdges().writeAsFormattedText(AppConfig.RESOURCES_GRAPH_EDGES, WriteMode.OVERWRITE,
-				new TextFormatter<Edge<String, Double>>() {
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public String format(Edge<String, Double> value) {
-						double weight = Math.min(value.f2 / maxEdgeCount, 1);
-						int colorIntensityR = (int) (180. + (75 * weight));
-						int colorIntensityG = (int) (180. * (1. - weight));
-						int colorIntensityB = (int) (110. * (1. - weight));
-						return "{\"data\":{\"source\":\"" + value.f0 + "\",\"target\":\"" + value.f1 + "\",\"weight\":"
-								+ weight + "},\"group\":\"edges\",\"style\":{\"line-color\":\"rgb(" + colorIntensityR
-								+ ", " + colorIntensityG + "," + colorIntensityB + ")\"}},";
-					}
-				});
 
 		Graph<String, Long, Double> graphWithClusterId = graph
 				.run(new CommunityDetection<String>(AppConfig.maxIterations, AppConfig.delta));
@@ -115,7 +124,10 @@ public class TwitterNewsGraphCreator {
 							clusterId = t.f1;
 							wordList.add(t.f0);
 						}
-						out.collect(new Tuple2<Long, ArrayList<String>>(clusterId, wordList));
+						if (wordList.size() > 1) {
+							// we don't want 1-word cluster
+							out.collect(new Tuple2<Long, ArrayList<String>>(clusterId, wordList));
+						}
 					}
 				});
 		// tweetId, source, clusterId
@@ -167,36 +179,8 @@ public class TwitterNewsGraphCreator {
 
 						});
 
-		groupsWithWordsAndSources.writeAsFormattedText(AppConfig.RESOURCES_GRAPH_CLUSTER, WriteMode.OVERWRITE,
-				new TextFormatter<Tuple3<Long, ArrayList<String>, ArrayList<Tuple2<String, Long>>>>() {
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public String format(Tuple3<Long, ArrayList<String>, ArrayList<Tuple2<String, Long>>> value) {
-						String s = "{\"group\": " + value.f0 + ", \"words\": [";
-						boolean first = true;
-						for (String word : value.f1) {
-							if (first) {
-								first = false;
-							} else {
-								s += ", ";
-							}
-							s += "\"" + word + "\"";
-						}
-						s += "], \"sources\": [";
-						first = true;
-						for (Tuple2<String, Long> source : value.f2) {
-							if (first) {
-								first = false;
-							} else {
-								s += ", ";
-							}
-							s += "{\"name\": \"" + source.f0 + "\", \"count\": " + source.f1 + "}";
-						}
-						s += "]}, ";
-						return s;
-					}
-				});
+		OutputEdges.set(graph.getEdges());
+		OutputCluster.set(groupsWithWordsAndSources);
 
 		env.execute();
 	}

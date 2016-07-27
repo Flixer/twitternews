@@ -2,6 +2,7 @@ var cy;
 var graphData = [];
 var numberOfGraphResLoaded = 0;
 var wordCloudData;
+var historicalData;
 var wordFrequencyList;
 
 // word-cloud values
@@ -48,6 +49,7 @@ function reloadInformation() {
 	graphData = [];
 	$.get("resources/edges.txt", graphResDataParser, "text");
 	$.get("resources/nodes.txt", graphResDataParser, "text");
+	createHistoricalChart();
 }
 
 var wordCloudParser = function(data) {
@@ -63,8 +65,8 @@ var wordCloudParser = function(data) {
 
 		for (var j = 0; j < wordCloudData[i].words.length; j++) {
 			var sizeMultiplier = wordFrequencyList[wordCloudData[i].words[j]];
-			if (!sizeMultiplier) {
-				sizeMultiplier = 0.1;
+			if (sizeMultiplier < 0.03) {
+				sizeMultiplier = 0.03;
 			}
 			wordslist.push({
 				'text' : wordCloudData[i].words[j],
@@ -119,7 +121,6 @@ var drawTagCloud = function(words) {
 
 	wordcloud.selectAll("text").data(words).enter().append("text").style(
 			"font-size", function(d) {
-				console.log(d.size);
 				return d.size + "px";
 			}).style("fill", function(d) {
 		return fill(d.text.toLowerCase());
@@ -400,6 +401,118 @@ var initCY = (function() { // on dom ready
 $(function() {
 	FastClick.attach(document.body);
 });
+
+var createHistoricalChart = function() {
+	$("#historical").html("<svg width=\"" + ($("#historical").width() - 200) + "\" " +
+			"height=\"" + ($("#historical").height() - 200) + "\" class=\"historical-svg\"></svg>" +
+			"<div class=\"dateInfo\" data-toggle=\"tooltip\" data-placement=\"right\" " +
+			"data-animation=\"false\" data-trigger=\"manual\"></div>");
+	
+	var svg = d34.select("svg.historical-svg"),
+    margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom,
+    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	var x = d34.scaleBand()
+	    .rangeRound([0, width])
+	    .padding(0.1)
+	    .align(0.1);
+	
+	var y = d34.scaleLinear()
+	    .rangeRound([height, 0]);
+	
+	var z = d34.scaleOrdinal()
+	    .range(d34.schemeCategory20);
+	
+	var stack = d34.stack();
+	
+	d34.csv("resources/historical.csv", type, function(error, data) {
+	  if (error) throw error;
+	
+	  //data.sort(function(a, b) { return b.total - a.total; });
+	
+	  x.domain(data.map(function(d) { return d.Date; }));
+	  y.domain([0, d34.max(data, function(d) { return d.total; })]).nice();
+	  z.domain(data.columns.slice(1));
+	
+	  g.selectAll(".serie")
+	    .data(stack.keys(data.columns.slice(1))(data))
+	    .enter().append("g")
+	      .attr("class", "serie")
+	      .attr("fill", function(d) { return z(d.key); })
+	    .selectAll("rect")
+	    .data(function(d) { return d; })
+	    .enter().append("rect")
+	      .attr("x", function(d) { return x(d.data.Date); })
+	      .attr("y", function(d) { return y(d[1]); })
+	      .attr("height", function(d) { return y(d[0]) - y(d[1]); })
+	      .attr("width", x.bandwidth());
+	
+	  g.append("g")
+	      .attr("class", "axis axis--x")
+	      .attr("transform", "translate(0," + height + ")")
+	      .call(d34.axisBottom(x));
+	
+	  g.append("g")
+	      .attr("class", "axis axis--y")
+	      .call(d34.axisLeft(y).ticks(10, "s"))
+	    .append("text")
+	      .attr("x", 2)
+	      .attr("y", y(y.ticks(10).pop()))
+	      .attr("dy", "0.35em")
+	      .attr("text-anchor", "start")
+	      .attr("fill", "#000")
+	      .text("Tweets");
+	
+	  var legend = g.selectAll(".legend")
+	    .data(data.columns.slice(1).reverse())
+	    .enter().append("g")
+	      .attr("class", "legend")
+	      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; })
+	      .style("font", "10px sans-serif");
+	
+	  legend.append("rect")
+	      .attr("x", width - 18)
+	      .attr("width", 18)
+	      .attr("height", 18)
+	      .attr("fill", z);
+	
+	  legend.append("text")
+	      .attr("x", width - 24)
+	      .attr("y", 9)
+	      .attr("dy", ".35em")
+	      .attr("text-anchor", "end")
+	      .text(function(d) { return d; });
+	  
+		$(".historical-svg rect").unbind("mousemove").on('mousemove', function(e) {
+			var infoText = "<b>" + $(".historical-svg g.axis--x > g:nth-child(" + ($(this).index() + 2) + ") text").html() + "</b><br/>";
+			var hData = historicalData[$(this).index()];
+			var i = 0;
+			for (var n in hData) {
+				if (n != "Date" && n != "total") {
+					infoText += "<br/><span style=\"color: " + d34.schemeCategory20[i] + "\"><b>" + n + ":</b> " + hData[n] + "</span>";
+					i++;
+				}
+			}
+			$(".dateInfo").html(infoText);
+			$(".dateInfo").css({top: e.pageY, left: e.pageX });
+			$('.dateInfo').tooltip('show');
+			$('.dateInfo').show();
+		});
+		$(".historical-svg rect").unbind("mouseleave").on('mouseleave', function(e) {
+			$('.dateInfo').tooltip('hide');
+			$('.dateInfo').hide();
+		});
+		historicalData = data;
+	});
+	
+	function type(d, i, columns) {
+	  for (i = 1, t = 0; i < columns.length; ++i) t += d[columns[i]] = +d[columns[i]];
+	  d.total = t;
+	  return d;
+	}
+}
 
 // the Twitter Account Dropdown is only enabled if the search should be account
 // specific

@@ -12,10 +12,10 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 
+import de.bigdatapraktikum.twitternews.config.AppConfig;
 import de.bigdatapraktikum.twitternews.processing.StatusToTweetMapper;
 import de.bigdatapraktikum.twitternews.source.Tweet;
 import de.bigdatapraktikum.twitternews.source.TwitterNewsSource;
-import de.bigdatapraktikum.twitternews.utils.AppConfig;
 import twitter4j.Status;
 
 public class TwitterNewsCollector {

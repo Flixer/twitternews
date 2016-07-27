@@ -1,4 +1,4 @@
-package de.bigdatapraktikum.twitternews.utils;
+package de.bigdatapraktikum.twitternews.config;
 
 public class AppConfig {
 	public static final int STATUS_OK = 200;
@@ -16,9 +16,12 @@ public class AppConfig {
 	public static final String RESOURCES_GRAPH_NODES = "src/main/resources/web/resources/nodes.txt";
 	public static final String RESOURCES_GRAPH_EDGES = "src/main/resources/web/resources/edges.txt";
 	public static final String RESOURCES_GRAPH_CLUSTER = "src/main/resources/web/resources/cluster.txt";
+	public static final String RESOURCES_GRAPH_HISTORICAL = "src/main/resources/web/resources/historical.csv";
 
 	public static final String[] TWITTER_ACCOUNTS_TO_CRAWL = new String[] { "faznet", "SPIEGELONLINE", "SZ",
 			"jungewelt" };
+	public static final String[] TWITTER_ACCOUNTS_READABLE = new String[] { "FAZ.NET", "SPIEGEL ONLINE",
+			"Süddeutsche Zeitung", "junge Welt" };
 
 	public static final String[] IRRELEVANT_WORDS = new String[] { "aber", "abermals", "abgerufen", "abgerufene",
 			"abgerufener", "abgerufenes", "ähnlich", "alle", "allein", "allem", "allemal", "allen", "allenfalls",

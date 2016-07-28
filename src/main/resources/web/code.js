@@ -4,6 +4,7 @@ var numberOfGraphResLoaded = 0;
 var wordCloudData;
 var historicalData;
 var wordFrequencyList;
+var sourcesData;
 
 // word-cloud values
 var fill;
@@ -49,12 +50,11 @@ function reloadInformation() {
 	graphData = [];
 	$.get("resources/edges.txt", graphResDataParser, "json");
 	$.get("resources/nodes.txt", graphResDataParser, "json");
-	createHistoricalChart();
 }
 
 var wordCloudParser = function(data) {
 	// draw new tag cloud -> delete old clouds
-	$("#tag-cloud").html("");
+	$("#tag-wrapper").html("");
 
 	wordCloudData = data;
 
@@ -91,12 +91,12 @@ var wordCloudParser = function(data) {
 			
 			if (!elm.hasClass("has-additional-info")) {
 				elm.addClass("has-additional-info");
-				var cloudSourceHtml = "TODO - Make as chart: <br/><br/>";
+				/*var cloudSourceHtml = "";
 				for (var j = 0; j < wordCloudData[elm.index()].sources.length; j++) {
 					var source = wordCloudData[elm.index()].sources[j];
 					cloudSourceHtml += "<b>" + source.name + ":</b> " + source.count + "<br/>"
 				}
-				elm.prepend("<div class=\"cloud-sources\">" + cloudSourceHtml + "</div>");
+				elm.prepend("<div class=\"cloud-sources\">" + cloudSourceHtml + "</div>");*/
 				elm.prepend("<div class=\"cloud-header\"><span class=\"fa fa-times config-toggle close-word-cloud\"></span></div>");
 				$(".close-word-cloud").click(
 						function() {
@@ -113,10 +113,32 @@ var wordCloudParser = function(data) {
 };
 
 var drawTagCloud = function(words) {
-	wordcloud = d3.select("#tag-cloud").append("div").attr("class",
+	wordcloud = d3.select("#tag-wrapper").append("div").attr("class",
 			"word-cloud-wrapper").append("svg").attr("width", size[0]).attr(
 			"height", size[1]).append("g").attr("transform",
 			"translate(" + (size[0] / 2) + "," + (size[1] / 2) + ")");
+	var index = $("#tag-wrapper").children().length - 1;
+	sourceDistributionHtml = '<div class="sourceDistribution">';
+	var sourcesSum = 0;
+	for (var j = 0; j < wordCloudData[index].sources.length; j++) {
+		var source = wordCloudData[index].sources[j];
+		sourcesSum += source.count;
+	}
+	
+	var i = 0;
+	sourcesData.forEach(function (sName){
+		for (var j = 0; j < wordCloudData[index].sources.length; j++) {
+			var source = wordCloudData[index].sources[j];
+			if (source.name == sName) {
+				sourceDistributionHtml += '<div style="width: ' + (100 * source.count / sourcesSum) + 
+				  '%; background-color: ' + d34.schemeCategory20[i] + '"></div>';
+				break;
+			}
+		}
+		i++;
+	});
+	sourceDistributionHtml += '</div>';
+	$($("#tag-wrapper").children()[index]).prepend(sourceDistributionHtml);
 
 	wordcloud.selectAll("text").data(words).enter().append("text").style(
 			"font-size", function(d) {
@@ -135,8 +157,6 @@ var drawTagCloud = function(words) {
 
 var graphResDataParser = function(loadedData) {
 	if (loadedData.length && loadedData[0].group == "nodes") {
-		// wait for loading cluster information until node information are loaded
-		$.get("resources/cluster.txt", wordCloudParser, "json");
 		
 		wordFrequencyList = {};
 		for (var n in loadedData) {
@@ -149,6 +169,9 @@ var graphResDataParser = function(loadedData) {
 	if (numberOfGraphResLoaded == 2) {
 		initCY();
 	}
+	
+	// wait with historical chart creation until cy graph is finished
+	createHistoricalChart();
 };
 
 var initCY = (function() { // on dom ready
@@ -431,6 +454,16 @@ var createHistoricalChart = function() {
 	
 	  x.domain(data.map(function(d) { return d.Date; }));
 	  y.domain([0, d34.max(data, function(d) { return d.total; })]).nice();
+	  sourcesData = data.columns.slice(1);
+	  
+	  var barExplanationHtml = "";
+		var i = 0;
+		sourcesData.forEach(function (sName){
+			barExplanationHtml += '<div class="entry"><div style="background-color: ' + d34.schemeCategory20[i] + '"></div>' + sName + '</div>';
+			i++;
+		});
+	  $("#bar-explanation").html(barExplanationHtml);
+	  
 	  z.domain(data.columns.slice(1));
 	
 	  g.selectAll(".serie")
@@ -502,6 +535,9 @@ var createHistoricalChart = function() {
 			$('.dateInfo').hide();
 		});
 		historicalData = data;
+
+		// wait for loading cluster information until node information are loaded
+		$.get("resources/cluster.txt", wordCloudParser, "json");
 	});
 	
 	function type(d, i, columns) {

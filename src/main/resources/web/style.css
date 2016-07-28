@@ -170,11 +170,12 @@ h1 {
 .word-cloud-wrapper {
     background-color: #fff;
     border: 1px solid #f3f3f3;
+    border-top-width: 0;
     float: left;
     height: 200px;
     margin: 10px;
     text-align: center;
-    transition: all 0.5s ease 0s;
+    transition: border-color 0.5s ease 0s;
     width: 400px;
 }
 .word-cloud-wrapper:hover {
@@ -188,13 +189,16 @@ h1 {
 .word-cloud-wrapper.cloud-expanded, .word-cloud-wrapper.cloud-expanded:hover {
     background-color: #fff;
     border-color: #62daea;
+    border-top-width: 1px;
     cursor: auto;
     height: 98%;
     left: 0;
-    padding-top: 3em;
     position: absolute;
     top: 0;
     width: 98%;
+}
+.config-closed .word-cloud-wrapper.cloud-expanded {
+    width: calc(98% - 170px);
 }
 .word-cloud-wrapper.cloud-expanded .cloud-header, .word-cloud-wrapper.cloud-expanded .cloud-sources {
 	display: block;
@@ -214,7 +218,34 @@ h1 {
     padding: 5px;
     position: absolute;
 }
-
+.sourceDistribution {
+    height: 5px;
+}
+.cloud-expanded .sourceDistribution {
+	height: 40px;
+	margin-bottom: 20px;
+}
+.sourceDistribution div {
+    float: left;
+    height: 100%;
+}
+#bar-explanation {
+    position: absolute;
+    right: 10px;
+    display: none;
+}
+body.config-closed #bar-explanation {
+	display: block;
+}
+#bar-explanation .entry {
+    padding: 6px 0;
+}
+#bar-explanation .entry > div {
+    float: left;
+    height: 17px;
+    margin-right: 10px;
+    width: 17px;
+}
 
 /* Loader CSS */
 

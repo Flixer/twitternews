@@ -39,8 +39,6 @@ import de.bigdatapraktikum.twitternews.source.Tweet;
 // this class creates a co-occurrence graph
 public class TwitterNewsGraphCreator {
 	public void execute(Settings settings) throws Exception {
-		// TODO: add more comments to explain what is happening in this class
-
 		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 		env.setParallelism(AppConfig.PARALLELISM);
 
@@ -52,9 +50,6 @@ public class TwitterNewsGraphCreator {
 			@Override
 			public void flatMap(String value, Collector<Tweet> out) throws Exception {
 				Tweet tweet = Tweet.fromString(value);
-				// currently this filter can filter time range
-				// later this filter function could be upgraded with different
-				// filter-properties
 				if (settings.isValidTweet(tweet)) {
 					out.collect(tweet);
 				}

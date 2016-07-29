@@ -246,6 +246,9 @@ body.config-closed #bar-explanation {
     margin-right: 10px;
     width: 17px;
 }
+.analyze-settings {
+	margin-bottom: 25px;
+}
 
 /* Loader CSS */
 

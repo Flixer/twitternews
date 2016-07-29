@@ -374,7 +374,7 @@ var initCY = (function() { // on dom ready
 	}
 
 	function makeButton(opts) {
-		var $button = $('<button class="btn btn-default">' + opts.label
+		var $button = $('<button class="btn btn-primary">' + opts.label
 				+ '</button>');
 
 		$btnParam.append($button);

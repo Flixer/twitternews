@@ -40,7 +40,8 @@ public class Settings implements Serializable {
 		if (source != null && (tweet.getSource() == null || !tweet.getSource().equals(source))) {
 			return false;
 		}
-		if (tweetContent != null && (tweet.getContent() == null || !tweet.getContent().contains(tweetContent))) {
+		if (tweetContent != null
+				&& (tweet.getContent() == null || !tweet.getContent().toLowerCase().contains(tweetContent))) {
 			return false;
 		}
 
@@ -76,7 +77,7 @@ public class Settings implements Serializable {
 	}
 
 	public void setTweetContent(String tweetContent) {
-		this.tweetContent = tweetContent;
+		this.tweetContent = tweetContent.toLowerCase();
 	}
 
 	public int getClusterIterationCount() {
